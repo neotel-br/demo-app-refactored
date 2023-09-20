@@ -1,0 +1,26 @@
+{% extends 'rh/layout.html' %}
+{% load static %}
+{% block head %}
+        <link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
+{% block main %}
+<div class='sidebar'>
+    <div class="departments">
+        <div class="department btn-sidebar">
+            <img src="{% static 'images/saude-icon.svg'%}" alt="">
+        </div>
+        <div class="department btn-sidebar">
+            <img src="{% static 'images/saude-icon.svg'%}" alt="">
+        </div>
+    </div>
+        <div class="logout btn-sidebar">
+            <img src="{% static 'images/saude-icon.svg'%}" alt="">
+        </div>
+</div>
+<div class='article'>
+    <div class="person">
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Demo App</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+            {% block head %}
+            {% endblock %}
+    </head>
+    <body>
+        <div class="header">
+            <div class='logo'>
+                <img src="{% static 'images/logo.svg' %}">
+            </div>
+        </div>
+        <div class="main">
+            {% block main %}
+            {% endblock %}
+        </div>
+        <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    </body>
+
+</html>
