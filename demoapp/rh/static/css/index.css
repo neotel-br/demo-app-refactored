@@ -109,4 +109,66 @@ Default: 9px
     justify-content: flex-end;
     background-color: #748FFC;
     border-radius: 0.8rem;
+    padding: 3.2rem ;
+}
+.container-employees{
+    margin-top:1.2rem;
+}
+.employee{
+    display:flex;
+    flex-direction: row;
+    gap: 2.4rem;
+    justify-content: space-between;
+    background-color: white;
+    align-items: center;
+    padding:1.2rem;
+    border-radius: 0.8rem;
+
+}
+.employee-picture img{
+    width: 9.6rem;
+    border-radius: 50%;
+}
+
+.picture-info-employee{
+    display: flex;
+    gap:   1.2rem;
+    align-items: flex-start;
+}
+.employee-info{
+    padding:1.2rem;
+}
+
+
+.employee-btn-view button{
+    background-color: #748FFC;
+    text-decoration: none;
+    border: none;
+    color: white;
+    border-radius: 0.8rem;
+    padding:1.2rem 3.2rem;
+    cursor: pointer;
+}
+
+
+.employee-info .name{
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+.employee-info .title-job{
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.employee-info .id-employee{
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.title-department{
+    background-color: #fff;
+    max-width: 15rem;
+    border-radius: 0.8rem;
+    text-align: center;
+    padding:  0.8rem;
 }
