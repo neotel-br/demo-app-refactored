@@ -7,8 +7,7 @@ import random
 
 class Department(models.Model):
     department_name = models.CharField(max_length=30)
-    department_icon = models.ImageField(
-        upload_to='rh/static/images/', null=True)
+    department_icon = models.ImageField(upload_to="rh/static/images/uploads", null=True)
 
     def __str__(self):
         return f"{self.department_name}"
@@ -24,11 +23,12 @@ class Position(models.Model):
 
 class Employee(models.Model):
     employee_name = models.CharField(max_length=100)
-    employee_icon = models.ImageField(upload_to='rh/', null=True)
+    employee_icon = models.ImageField(upload_to="rh/static/images/uploads", null=True)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     employee_titlejob = models.ForeignKey("Position", on_delete=models.CASCADE)
     employee_id = models.CharField(
-        null=False, max_length=5, default=random.randint(10001, 99999), editable=False)
+        null=False, max_length=5, default=random.randint(10001, 99999), editable=False
+    )
     employee_cpf = models.CharField(max_length=20)
     employee_rg = models.CharField(max_length=20)
     employee_birthdate = models.DateField(null=False)

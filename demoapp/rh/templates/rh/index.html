@@ -8,7 +8,7 @@
     <div class="departments">
         {% for department in departments %}
         <div class="department btn-sidebar">
-            <img src="{% static 'images/saude-icon.svg'%}" id="{{ department.id }}" class="btn-dept">
+          <img src="{{ department.department_icon.url }}" id="{{ department.id }}" class="btn-dept">
         </div>
         {% endfor %}
     </div>
