@@ -7,6 +7,8 @@ db.sqlite3
 media
 migrations
 
+uploads/
+
 # Backup files #
 *.bak
 
