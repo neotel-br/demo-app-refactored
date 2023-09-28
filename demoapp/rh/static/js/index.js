@@ -1,4 +1,28 @@
 
+document.addEventListener("DOMContentLoaded", function(event){
+  departments = document.querySelectorAll(".btn-sidebar")
+  console.log(departments)
+  departments.forEach(department => {
+      department.addEventListener("click", () =>{
+        document.querySelector('.page-departments').classList.remove("hidden")
+        document.querySelector('.page-view-employee').classList.add("hidden")
+
+        btn_dept = department.firstElementChild
+        current_dept = document.querySelector('#id-h1').innerText
+        if(current_dept != department.id){
+          clearDepartment()
+          getDepartment(btn_dept)
+        }
+      })
+  })
+
+
+  var first_dept = document.querySelector('.departments').firstElementChild
+  first_dept.click()
+})
+
+
+
 function getDepartment(department){
     department_id = department.id
     fetch('/rh/get/employees/' + department_id, {
@@ -11,8 +35,7 @@ function getDepartment(department){
           verifyIfObjectAreCreated(data.employees[i], data.employees[i].employee_id)
         }
       }
-      changeTitleDepartment(data.department[0].department_name)
-      
+      changeTitleDepartment(data.department[0].department_name)      
     })
     .catch(e => {
       console.log("Error: " + e)
@@ -43,10 +66,16 @@ function changeTitleDepartment(department_name){
 function createEmployee(employee){
   const div_employee = document.createElement("div")
   div_employee.className = "employee"
+  div_employee.id = employee.id
   const div_pic_info_emp = document.createElement("div")
   div_pic_info_emp.className = "picture-info-employee"
   const div_emp_btn_view = document.createElement("div")
   div_emp_btn_view.className = "employee-btn-view"
+
+  div_emp_btn_view.addEventListener("click", () => {
+    togglePage()
+  })
+
   div_employee.appendChild(div_pic_info_emp)
   div_employee.appendChild(div_emp_btn_view)
   
@@ -90,10 +119,8 @@ function createEmployee(employee){
 
 function clearDepartment(){
   div_employee = document.querySelector('.container-employees')
-  console.log(div_employee)
   while(div_employee.hasChildNodes()){
     div_employee.removeChild(div_employee.firstChild)
-    console.log("apagou")
   }
 }
 
@@ -113,16 +140,10 @@ function verifyIfObjectAreCreated(employee, id){
 
 }
 
-departments = document.querySelectorAll(".btn-dept")
-departments.forEach(department => {
-    department.addEventListener("click", () =>{
-      current_dept = document.querySelector('#id-h1').innerText
-      if(current_dept != department.parentElement.id){
-        clearDepartment()
-        getDepartment(department)
-      }
-    })
-})
+function togglePage(){
+  document.querySelector('.page-departments').classList.toggle("hidden")
+  document.querySelector('.page-view-employee').classList.toggle("hidden")
+}
 
 
 // departments.forEach(("department", function(){

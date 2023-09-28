@@ -175,3 +175,7 @@ Default: 9px
     text-align: center;
     padding:  0.8rem;
 }
+
+.hidden{
+  display: none;
+}

@@ -13,33 +13,40 @@
         {% endfor %}
     </div>
     <div class="logout btn-sidebar">
-        <img src="{% static 'images/saude-icon.svg'%}" alt="">
+        <img src="{% static 'images/logout.svg'%}" alt="">
     </div>
 
 </div>
 <div class='article'>
-  <div class="title-department">
-        <h1 id="id-h1">Departamento</h1>
-    </div>
-    <div class="container-employees" id="">
-        <!-- <div class="employee"> -->
-        <!--     <div class="picture-info-employee"> -->
-        <!--         <div class="employee-picture"> -->
-        <!--             <img src="{% static 'images/sanuka.png' %}" alt=""> -->
-        <!--         </div> -->
-        <!--         <div class="employee-info"> -->
-        <!--             <p class="name">Sanuka LambeLambe<p> -->
-        <!--             <p class="title-job">Analista de Segurança<p> -->
-        <!--             <p class="id-employee">420<p> -->
-        <!---->
-        <!--         </div> -->
-        <!--     </div> -->
-        <!--     <div class="employee-btn-view"> -->
-  <!--         <button type="button">View</button> -->
-        <!--     </div> -->
-        <!-- </div> -->
+  <div class="page-departments">
+    <div class="title-department">
+          <h1 id="id-h1">Departamento</h1>
+      </div>
+      <div class="container-employees">
+          <!-- <div class="employee"> -->
+          <!--     <div class="picture-info-employee"> -->
+          <!--         <div class="employee-picture"> -->
+          <!--             <img src="{% static 'images/sanuka.png' %}" alt=""> -->
+          <!--         </div> -->
+          <!--         <div class="employee-info"> -->
+          <!--             <p class="name">Sanuka LambeLambe<p> -->
+          <!--             <p class="title-job">Analista de Segurança<p> -->
+          <!--             <p class="id-employee">420<p> -->
+          <!---->
+          <!--         </div> -->
+          <!--     </div> -->
+          <!--     <div class="employee-btn-view"> -->
+    <!--         <button type="button">View</button> -->
+          <!--     </div> -->
+          <!-- </div> -->
 
     </div>
+  </div>
+  <div class="page-view-employee hidden">
+    <div>
+      <p>Teste</>
+    </div> 
+  </div> 
 </div>
 <script src="{% static 'js/index.js'%}"></script>
 {% endblock %}
