@@ -16,16 +16,16 @@ def index(request):
 def get_employees(request, id):
     if request.method == "GET":
         employees_filter = Employee.objects.filter(department=id)
-        employees_response = list(employees_filter.values())
+        department = list(Department.objects.filter(id=id).values())
+        employees = list(employees_filter.values())
         i = 0
         for employee in employees_filter:
-            employees_response[i][
-                "employee_titlejob"
-            ] = employee.employee_titlejob.position_name
+            employees[i]["employee_titlejob"] = employee.employee_titlejob.position_name
 
             i += 1
-        print(employees_response)
+        print(employees)
+        print(department)
 
-        return JsonResponse({"employees": employees_response})
+        return JsonResponse({"employees": employees, "department": department})
     else:
         return JsonResponse({"message_error": "Error"})

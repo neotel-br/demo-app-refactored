@@ -7,7 +7,7 @@
 <div class='sidebar'>
     <div class="departments">
         {% for department in departments %}
-        <div class="department btn-sidebar">
+        <div class="department btn-sidebar" id= {{ department.department_name }}>
           <img src="{{ department.department_icon.url }}" id="{{ department.id }}" class="btn-dept">
         </div>
         {% endfor %}
@@ -19,7 +19,7 @@
 </div>
 <div class='article'>
   <div class="title-department">
-        <h1>Departamento</h1>
+        <h1 id="id-h1">Departamento</h1>
     </div>
     <div class="container-employees" id="">
         <!-- <div class="employee"> -->
@@ -35,7 +35,7 @@
         <!--         </div> -->
         <!--     </div> -->
         <!--     <div class="employee-btn-view"> -->
-        <!--         <button type="button">View</button> -->
+  <!--         <button type="button">View</button> -->
         <!--     </div> -->
         <!-- </div> -->
 

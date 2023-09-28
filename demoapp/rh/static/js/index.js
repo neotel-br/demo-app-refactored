@@ -6,12 +6,13 @@ function getDepartment(department){
     })
     .then(response => response.json())
     .then(data => {
-      const myEmptyObj = {}
       if (!Object.keys(data).length == 0) {
         for (let i = 0; i < Object.keys(data.employees).length; i++) {
           verifyIfObjectAreCreated(data.employees[i], data.employees[i].employee_id)
         }
       }
+      changeTitleDepartment(data.department[0].department_name)
+      
     })
     .catch(e => {
       console.log("Error: " + e)
@@ -33,6 +34,10 @@ function getDepartment(department){
         //         <button type="button">View</button>
         //     </div>
         // </div>
+function changeTitleDepartment(department_name){
+  h1_title = document.querySelector('#id-h1')
+  h1_title.innerText = department_name
+}
 
 
 function createEmployee(employee){
@@ -83,6 +88,15 @@ function createEmployee(employee){
 
 }
 
+function clearDepartment(){
+  div_employee = document.querySelector('.container-employees')
+  console.log(div_employee)
+  while(div_employee.hasChildNodes()){
+    div_employee.removeChild(div_employee.firstChild)
+    console.log("apagou")
+  }
+}
+
 function verifyIfObjectAreCreated(employee, id){
   all_ids = document.querySelectorAll('.id-employee')
   count = 0
@@ -102,7 +116,11 @@ function verifyIfObjectAreCreated(employee, id){
 departments = document.querySelectorAll(".btn-dept")
 departments.forEach(department => {
     department.addEventListener("click", () =>{
-      getDepartment(department)
+      current_dept = document.querySelector('#id-h1').innerText
+      if(current_dept != department.parentElement.id){
+        clearDepartment()
+        getDepartment(department)
+      }
     })
 })
 
