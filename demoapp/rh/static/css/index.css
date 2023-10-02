@@ -179,3 +179,21 @@ Default: 9px
 .hidden{
   display: none;
 }
+
+/* VIEW EMPLOYEE */
+.employee-display-data{
+  display: flex;
+  background-color: white;
+  justify-content: space-between;
+}
+
+.employee-personal-data{
+  display: flex;
+  gap: 1.8rem;
+  background-color: white;
+  justify-content: space-around;
+}
+
+.bank-data{
+  background-color: white;
+}

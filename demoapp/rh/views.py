@@ -13,10 +13,10 @@ def index(request):
     return render(request, "rh/index.html", {"departments": departments})
 
 
-def get_employees(request, id):
+def get_employees(request, department_id):
     if request.method == "GET":
-        employees_filter = Employee.objects.filter(department=id)
-        department = list(Department.objects.filter(id=id).values())
+        employees_filter = Employee.objects.filter(department=department_id)
+        department = list(Department.objects.filter(id=department_id).values())
         employees = list(employees_filter.values())
         i = 0
         for employee in employees_filter:
@@ -29,3 +29,12 @@ def get_employees(request, id):
         return JsonResponse({"employees": employees, "department": department})
     else:
         return JsonResponse({"message_error": "Error"})
+
+
+def get_employee(request, employee_id):
+    if request.method == "GET":
+        employee = list(Employee.objects.filter(employee_id=employee_id).values())
+
+        return JsonResponse({"employee": employee})
+    else:
+        return JsonResponse({"message_error:": "Error"})
