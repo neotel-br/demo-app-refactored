@@ -110,6 +110,7 @@ Default: 9px
     background-color: #748FFC;
     border-radius: 0.8rem;
     padding: 3.2rem ;
+    height: 100%;
 }
 .container-employees{
     margin-top:1.2rem;
@@ -181,31 +182,57 @@ Default: 9px
 }
 
 /* VIEW EMPLOYEE */
+
+.page-view-employee{
+    display: flex;
+    background-color: white;
+    flex-direction: column;
+    gap: 4.8rem;
+    font-size: 1.6rem;
+    padding: 3.6rem;
+    border-radius: 0.8rem;
+    height: 100%;
+}
+
 .employee-display-data{
   display: flex;
-  background-color: white;
   justify-content: space-between;
+  align-items: center;
 }
 
 .employee-info{
     font-size: 2.4rem;
 }
 
+.employee-pic-info{
+  display: flex;
+  height: fit-content;
+  gap: 1.8rem;
+}
+
+.employee-btn-back button{
+  background-color: #748FFC;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 1.2rem 3.2rem;
+  border-radius: 0.8rem;
+  color: white;
+
+}
+
+/* background-color: #748FFC; */
+/*   text-decoration: none; */
+/*   border: none; */
+/*   color: white; */
+/*   border-radius: 0.8rem; */
+/*   padding: 1.2rem 3.2rem; */
+/*   cursor: pointer; */
+
 .employee-personal-data{
   display: flex;
-  gap: 1.8rem;
-  background-color: white;
-  justify-content: space-around;
-  background-color: yellow;
-}
-
-.bank-data{
-  background-color: white;
-}
-
-.page-view-employee{
-    display: flex;
-    flex-direction: column;
-    gap: 1.8rem;
-    font-size: 1.6rem;
+  justify-content: space-between;
+  padding: 2.4rem;
+  background-color: #748FFC;
+  border-radius: 0.8rem;
 }
