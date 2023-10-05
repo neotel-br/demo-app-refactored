@@ -1,12 +1,14 @@
-
+// Add event to department button
 document.addEventListener("DOMContentLoaded", function(event){
   departments = document.querySelectorAll(".btn-sidebar")
-  console.log(departments)
   departments.forEach(department => {
       department.addEventListener("click", () =>{
+        // toggle page departments and hide page view employee
         document.querySelector('.page-departments').classList.remove("hidden")
         document.querySelector('.page-view-employee').classList.add("hidden")
+       
 
+        // clear and loads employees if the current exhibited department is not the same as the button clicked
         btn_dept = department.firstElementChild
         current_dept = document.querySelector('#id-h1').innerText
         if(current_dept != department.id){
@@ -16,12 +18,10 @@ document.addEventListener("DOMContentLoaded", function(event){
       })
   })
 
-
+  // loads the first department as default
   var first_dept = document.querySelector('.departments').firstElementChild
   first_dept.click()
 })
-
-
 
 function getDepartment(department){
     department_id = department.id
@@ -41,22 +41,7 @@ function getDepartment(department){
       console.log("Error: " + e)
     })
 }
-        // <div class="employee">
-        //     <div class="picture-info-employee">
-        //         <div class="employee-picture">
-        //             <img src="{% static 'images/sanuka.png' %}" alt="">
-        //         </div>
-        //         <div class="employee-info">
-        //             <p class="name">Sanuka LambeLambe<p>
-        //             <p class="title-job">Analista de Segurança<p>
-        //             <p class="id-employee">420<p>
-        //
-        //         </div>
-        //     </div>
-        //     <div class="employee-btn-view">
-        //         <button type="button">View</button>
-        //     </div>
-        // </div>
+
 function changeTitleDepartment(department_name){
   h1_title = document.querySelector('#id-h1')
   h1_title.innerText = department_name
@@ -140,12 +125,8 @@ function verifyIfObjectAreCreated(employee, id){
 
 }
 
+// adds css class hidden that changes to display none
 function togglePage(){
   document.querySelector('.page-departments').classList.toggle("hidden")
   document.querySelector('.page-view-employee').classList.toggle("hidden")
 }
-
-
-// departments.forEach(("department", function(){
-//     department.addEventListener("onclick", getDepartment(department))
-// }))
