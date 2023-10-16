@@ -75,15 +75,12 @@ function getEmployeeView(employee) {
         document.querySelector('.page-departments').classList.remove("hidden")
         document.querySelector('.page-view-employee').classList.add("hidden")
     })
-
 }
-
 
 function changeTitleDepartment(department_name) {
     h1_title = document.querySelector('#id-h1')
     h1_title.innerText = department_name
 }
-
 
 function createEmployee(employee) {
     const div_employee = document.createElement("div")
@@ -170,8 +167,3 @@ function togglePage(employee) {
     hiddenClass()
     getEmployee(employee)
 }
-
-
-// departments.forEach(("department", function(){
-//     department.addEventListener("onclick", getDepartment(department))
-// }))
