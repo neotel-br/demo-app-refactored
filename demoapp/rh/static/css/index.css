@@ -96,6 +96,11 @@ Default: 9px
     opacity: 1;
 }
 
+/* .btn-sidebar{ */
+/*     height: 4.8rem; */
+/*     max-width: 12.8rem; */
+/* } */
+
 .logout{
     display: flex;
     flex-direction: column;
@@ -235,4 +240,28 @@ Default: 9px
   padding: 2.4rem;
   background-color: #748FFC;
   border-radius: 0.8rem;
+  color: white;
+  font-weight: bold;
 }
+
+.bank-data h2{
+    color: white;
+    background-color: #748FFC;
+    border: none;
+    text-decoration: none;
+    padding: 1.2rem 3.2rem;
+    border-radius: 0.8rem;
+    color: white;
+    width: 24.6rem;
+
+}
+.bank-data-div{
+    padding: 0.8rem 0;
+}
+
+.employee-pic{
+    height: 9.6rem;
+    max-width: 9.6rem;
+    border-radius: 50%;
+}
+

@@ -23,8 +23,6 @@ def get_employees(request, department_id):
             employees[i]["employee_titlejob"] = employee.employee_titlejob.position_name
 
             i += 1
-        print(employees)
-        print(department)
 
         return JsonResponse({"employees": employees, "department": department})
     else:
@@ -33,7 +31,12 @@ def get_employees(request, department_id):
 
 def get_employee(request, employee_id):
     if request.method == "GET":
-        employee = list(Employee.objects.filter(employee_id=employee_id).values())
+        employee = list(Employee.objects.filter(
+            employee_id=employee_id).values())
+
+        print(employee[0])
+        # employee[0]["employee_titlejob"] = employee[0].employee_titlejob.position_name
+        # employee[0]["employee_department"] = employee[0].department.department_name
 
         return JsonResponse({"employee": employee})
     else:

@@ -45,40 +45,42 @@
   <div class="page-view-employee hidden">
     <div class="employee-display-data">
       <div class="employee-pic-info">
-        <img src="{% static 'images/profile-photo.svg'%}">
+        <img class="employee-pic pic-view" src="{% static 'images/profile-photo.svg'%}">
         <div class="employee-info">
-          <p class="name">Jubiscreldo Alvarim</p>
-          <p class="title-job">Analista de Segurança</p>
-          <p class="id-employee">420</p>
+          <p class="employee-name"></p>
+          <p class="employee-title-job"></p>
+          <p class="employee-id"></p>
         </div>
       </div>
       <div class="employee-btn-back">
-        <button type="button">Voltar</button>
+        <button id="return" type="button">Voltar</button>
       </div>
     </div>
     <div class="employee-personal-data">
       <div>
-        <p>CPF: </p>
-        <p>RG: </p>
-        <p>Data Nascimento: </p>
+        <p class="employee-cpf"></p>
+        <p class="employee-rg"></p>
+        <p class="employee-birthdate"></p>
       </div>
       <div>
-        <p>Data de Admissão: </p>
-        <p>Cargo: </p>
-        <p>Salário: </p>
+        <p class="employee-startdate"></p>
+        <p class="employee-title-job"></p>
+        <p class="employee-salary"></p>
       </div>
       <div>
-        <p>Setor: </p>
-        <p>E-mail: </p>
-        <p>Telefone: </p>
+        <p class="employee-department"></p>
+        <p class="employee-email"></p>
+        <p class="employee-phone"></p>
       </div>
     </div>
     <div class="bank-data">
       <h2>Dados Bancários</h2>
-      <p>Agência: </p>
-      <p>Conta Corrente: </p>
+      <div class="bank-data-div">
+          <p class="employee-agency"></p>
+          <p class="employee-cc"></p>
+      </div>
     </div>
-  </div> 
+  </div>
 </div>
 <script src="{% static 'js/index.js'%}"></script>
 {% endblock %}
