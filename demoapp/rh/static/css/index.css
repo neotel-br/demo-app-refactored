@@ -56,7 +56,7 @@ Default: 9px
     max-width:170rem;
     margin: 3.2rem auto;
     height: 75vh;
-    display:flex;
+    display: flex;
     flex-direction: row;
     justify-content: space-around;
 }
@@ -94,6 +94,12 @@ Default: 9px
 .btn-sidebar:hover{
     background-color: #3B5BDB;
     opacity: 1;
+}
+
+.sidebar img{
+  max-width: 100%;
+  width: 4.8rem;
+
 }
 
 /* .btn-sidebar{ */
@@ -134,18 +140,17 @@ Default: 9px
     border-radius: 0.8rem;
 
 }
-.employee-picture img{
-    width: 9.6rem;
-    border-radius: 50%;
-}
 
 .picture-info-employee{
     display: flex;
-    gap:   1.2rem;
+    gap: 1.2rem;
     align-items: flex-start;
 }
 .employee-info{
-    padding:1.2rem;
+    padding: 1.2rem;
+    display: flex;
+    gap: 0.2rem;
+    flex-direction: column;
 }
 
 
@@ -161,11 +166,11 @@ Default: 9px
 
 
 .employee-info .name{
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 700;
 }
 .employee-info .title-job{
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: 500;
 }
 
@@ -249,19 +254,28 @@ Default: 9px
     background-color: #748FFC;
     border: none;
     text-decoration: none;
-    padding: 1.2rem 3.2rem;
+    padding: 1.2rem 2.4rem;
     border-radius: 0.8rem;
-    color: white;
     width: 24.6rem;
-
 }
+
 .bank-data-div{
     padding: 0.8rem 0;
 }
 
 .employee-pic{
     height: 9.6rem;
-    max-width: 9.6rem;
+    width: 9.6rem;
+    max-width: 100%;
     border-radius: 50%;
 }
 
+.employee-name{
+  font-weight: 600;
+  font-size: 2.4rem;
+}
+
+.employee-id{
+  font-weight: 400;
+  font-size: 1.8rem;
+}

@@ -57,6 +57,7 @@ Default: 9px
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: Inter, Helvetica, sans-serif;
 }
 
 html {
@@ -66,6 +67,7 @@ html {
 
 body{
     background-color: #DBE4FF;
+    scroll-behavior: smooth;
 }
 
 .header{
