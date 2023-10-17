@@ -8,7 +8,6 @@ import json
 
 def index(request):
     departments = Department.objects.all()
-    employees = Employee.objects.all()
 
     return render(request, "rh/index.html", {"departments": departments})
 
@@ -31,13 +30,21 @@ def get_employees(request, department_id):
 
 def get_employee(request, employee_id):
     if request.method == "GET":
-        employee = list(Employee.objects.filter(
-            employee_id=employee_id).values())
+        employee_values = list(
+            Employee.objects.filter(employee_id=employee_id).values()
+        )
 
-        print(employee[0])
-        # employee[0]["employee_titlejob"] = employee[0].employee_titlejob.position_name
-        # employee[0]["employee_department"] = employee[0].department.department_name
+        employee_position = Employee.objects.filter(employee_id=employee_id)[
+            0
+        ].employee_titlejob.position_name
 
-        return JsonResponse({"employee": employee})
+        employee_department = Employee.objects.filter(employee_id=employee_id)[
+            0
+        ].department.department_name
+
+        employee_values[0]["employee_titlejob"] = employee_position
+        employee_values[0]["employee_department"] = employee_department
+        print(employee_values)
+        return JsonResponse({"employee": employee_values})
     else:
         return JsonResponse({"message_error:": "Error"})

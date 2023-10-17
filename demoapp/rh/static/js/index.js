@@ -1,6 +1,5 @@
-
 document.addEventListener("DOMContentLoaded", function(event) {
-    departments = document.querySelectorAll(".btn-sidebar")
+    departments = document.querySelectorAll(".department")
     departments.forEach(department => {
         department.addEventListener("click", () => {
             document.querySelector('.page-departments').classList.remove("hidden")
@@ -39,6 +38,7 @@ function getDepartment(department) {
             console.log("Error: " + e)
         })
 }
+
 function getEmployee(employee) {
     employee_id = employee.employee_id
     fetch('/get/employee/' + employee_id, {
@@ -46,7 +46,7 @@ function getEmployee(employee) {
     })
         .then(response => response.json())
         .then(data => {
-            getEmployeeView(employee)
+            getEmployeeView(data.employee[0])
         })
         .catch(e => {
             console.log("Error: " + e)
@@ -56,8 +56,7 @@ function getEmployee(employee) {
 function getEmployeeView(employee) {
     employee_pic = document.querySelector(".pic-view").src = "images/" + employee.employee_icon
     employee_name = document.querySelector(".employee-name").innerText = employee.employee_name
-    // employee_name = document.querySelector(".employee-name").innerText = employee.employee_name
-    // employee_title_job = document.querySelector(".employee-title-job").innerText = employee.employee_title_job
+    var employee_title_job = document.querySelector(".employee-title-job").innerText = employee.employee_titlejob
     var employee_id = document.querySelector(".employee-id").innerText = employee.employee_id
     var employee_cpf = document.querySelector(".employee-cpf").innerText = "CPF: " + employee.employee_cpf
     var employee_rg = document.querySelector(".employee-rg").innerText = "RG: " + employee.employee_rg
