@@ -1,11 +1,15 @@
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from .models import *
-import json
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
 
+@login_required()
 def index(request):
     departments = Department.objects.all()
 
@@ -28,6 +32,7 @@ def get_employees(request, department_id):
         return JsonResponse({"message_error": "Error"})
 
 
+@login_required()
 def get_employee(request, employee_id):
     if request.method == "GET":
         employee_values = list(
@@ -48,3 +53,25 @@ def get_employee(request, employee_id):
         return JsonResponse({"employee": employee_values})
     else:
         return JsonResponse({"message_error:": "Error"})
+
+
+def login_view(request):
+    form = AuthenticationForm(request, data=request.POST)
+    if request.method == "POST":
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect("index")
+            else:
+                return redirect("login")
+    else:
+        print(request.POST)
+    return render(request, "rh/login.html", {"form": form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("login")
