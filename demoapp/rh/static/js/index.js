@@ -67,8 +67,8 @@ function getEmployeeView(employee) {
     var employee_department = document.querySelector(".employee-department").innerText = "Setor: " + employee.employee_department
     var employee_email = document.querySelector(".employee-email").innerText = "E-mail: " + employee.employee_email
     var employee_phone = document.querySelector(".employee-phone").innerText = "Telefone: " + employee.employee_phone
-    var employee_agency = document.querySelector(".employee-agency").innerText = "Agência: " + employee.employee_agency
-    var employee_cc = document.querySelector(".employee-cc").innerText = "Conta corrente: " + employee.employee_cc
+    var employee_agency = document.querySelector(".employee-agency").innerText = employee.employee_agency
+    var employee_cc = document.querySelector(".employee-cc").innerText = employee.employee_cc
 
 
     document.querySelector("#return").addEventListener("click", () => {
