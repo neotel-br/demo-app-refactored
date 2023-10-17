@@ -264,7 +264,7 @@ Default: 9px
   width: 50%;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1.2rem;
 }
 
 .employee-pic{
@@ -286,6 +286,7 @@ Default: 9px
 
 .bank-data-div label{
   color: #ADB5BD;
+  font-weight: 600;
 }
 
 .bank-data-div input{
@@ -296,5 +297,4 @@ Default: 9px
   outline: none;
   background-color: #E3E3E3;
 }
-
 
