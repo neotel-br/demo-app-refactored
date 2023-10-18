@@ -24,7 +24,7 @@ def get_employees(request, department_id):
         i = 0
         for employee in employees_filter:
             employees[i]["employee_titlejob"] = employee.employee_titlejob.position_name
-
+            employees[i]["employee_department"] = employee.department.department_name
             i += 1
 
         return JsonResponse({"employees": employees, "department": department})
