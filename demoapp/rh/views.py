@@ -7,12 +7,9 @@ from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
-
-
 @login_required()
 def index(request):
     departments = Department.objects.all()
-
     return render(request, "rh/index.html", {"departments": departments})
 
 
