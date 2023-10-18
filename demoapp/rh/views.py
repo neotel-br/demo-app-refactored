@@ -32,29 +32,6 @@ def get_employees(request, department_id):
         return JsonResponse({"message_error": "Error"})
 
 
-@login_required()
-def get_employee(request, employee_id):
-    if request.method == "GET":
-        employee_values = list(
-            Employee.objects.filter(employee_id=employee_id).values()
-        )
-
-        employee_position = Employee.objects.filter(employee_id=employee_id)[
-            0
-        ].employee_titlejob.position_name
-
-        employee_department = Employee.objects.filter(employee_id=employee_id)[
-            0
-        ].department.department_name
-
-        employee_values[0]["employee_titlejob"] = employee_position
-        employee_values[0]["employee_department"] = employee_department
-        print(employee_values)
-        return JsonResponse({"employee": employee_values})
-    else:
-        return JsonResponse({"message_error:": "Error"})
-
-
 def login_view(request):
     form = AuthenticationForm(request, data=request.POST)
     if request.method == "POST":

@@ -6,7 +6,6 @@ urlpatterns = [
     path(
         "get/employees/<str:department_id>", views.get_employees, name="get-employees"
     ),
-    path("get/employee/<str:employee_id>", views.get_employee, name="get-employee"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
 ]
