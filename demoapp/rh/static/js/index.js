@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     departments.forEach(department => {
         department.addEventListener("click", () => {
             // assures that view employee is hidden and department employees is not
-            document.querySelector('.page-departments').classList.remove("hidden")
+            document.querySelector('.page-department-employees').classList.remove("hidden")
             document.querySelector('.page-view-employee').classList.add("hidden")
             
             // checks if the department isn't already clicked by checking the title
@@ -34,7 +34,7 @@ function getEmployees(department) {
     })
         .then(response => response.json())
         .then(data => {
-            // checks if employees aren't created, then displays it if not
+            // checks if employees aren't created, if not, then displays it
             if (!Object.keys(data).length == 0) {
                 for (let i = 0; i < Object.keys(data.employees).length; i++) {
                     var isCreated = verifyIfObjectAreCreated(data.employees[i], data.employees[i].employee_id)
@@ -144,7 +144,7 @@ function togglePage(employee) {
 
 
 function hiddenClass() {
-    document.querySelector('.page-departments').classList.toggle("hidden")
+    document.querySelector('.page-department-employees').classList.toggle("hidden")
     document.querySelector('.page-view-employee').classList.toggle("hidden")
 }
 
@@ -165,7 +165,7 @@ function viewInfoEmployee(employee) {
     var employee_cc = document.querySelector(".employee-cc").value = employee.employee_cc
 
     document.querySelector("#return").addEventListener("click", () => {
-        document.querySelector('.page-departments').classList.remove("hidden")
+        document.querySelector('.page-department-employees').classList.remove("hidden")
         document.querySelector('.page-view-employee').classList.add("hidden")
     })
 }
