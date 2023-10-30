@@ -1,11 +1,12 @@
 from django.db import models
+import requests
 import random
+import json
 
 
 class Department(models.Model):
     department_name = models.CharField(max_length=30)
-    department_icon = models.ImageField(
-        upload_to="rh/static/images/uploads", null=True)
+    department_icon = models.ImageField(upload_to="rh/static/images/uploads", null=True)
 
     def __str__(self):
         return f"{self.department_name}"
@@ -21,8 +22,7 @@ class Position(models.Model):
 
 class Employee(models.Model):
     employee_name = models.CharField(max_length=100)
-    employee_icon = models.ImageField(
-        upload_to="rh/static/images/uploads", null=True)
+    employee_icon = models.ImageField(upload_to="rh/static/images/uploads", null=True)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     employee_titlejob = models.ForeignKey("Position", on_delete=models.CASCADE)
     employee_id = models.CharField(
@@ -43,9 +43,27 @@ class Employee(models.Model):
     employee_cc = models.CharField(max_length=50)
 
     def __str__(self):
+        # dict_employee = self.__dict__
+        # for dict_key in dict_employee:
+        #     print(dict_key)
+        #     print(dict_key.rsplit("_"))
+        #     print(dict_employee[dict_key])
         return f"{self.employee_name} #{self.employee_id}"
 
     def save(self, *args, **kwargs):
+        dict_employee = self.__dict__
+        NAO_TOKEN = ["state", "id", "name", "icon", "startdate", "birthdate"]
+        for dict_key in dict_employee:
+            datatype = dict_key.split("_")[-1]
+            if datatype not in NAO_TOKEN:
+                tokenized_data = requests.post(
+                    url=f"http://127.0.0.1:3700/tokenize/{datatype}",
+                    data=json.dumps({datatype: dict_employee[dict_key]}),
+                ).json()
+
+                dict_employee[dict_key] = tokenized_data["token"]
+                print(dict_employee)
+
         while True:
             id = random.randint(10001, 99999)
             if Employee.objects.filter(employee_id=id).count() == 0:
