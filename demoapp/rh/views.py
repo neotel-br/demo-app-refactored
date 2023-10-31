@@ -30,7 +30,7 @@ def get_employees(request, department_id):
     if request.method == "GET":
         employees_filter = Employee.objects.filter(department=department_id)
         department = Department.objects.filter(id=department_id).values()
-        employees = employees_filter.values()
+        employees = list(employees_filter.values())
         nao_token = ["id", "name", "icon", "startdate", "birthdate", "department"]
         i = 0
         for employee in employees_filter:
@@ -47,6 +47,7 @@ def get_employees(request, department_id):
                             )
             i += 1
 
+        print(employees)
         detokenized_data = {}
         for field_type, values in data_type.items():
             response = requests.post(
@@ -55,9 +56,7 @@ def get_employees(request, department_id):
             ).json()
             detokenized_data[field_type] = response
 
-        return JsonResponse(
-            {"employees": list(employees), "department": list(department)}
-        )
+        return JsonResponse({"employees": employees, "department": list(department)})
     else:
         return JsonResponse({"message_error": "Error"})
 
