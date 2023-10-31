@@ -52,10 +52,10 @@ class Employee(models.Model):
 
     def save(self, *args, **kwargs):
         dict_employee = self.__dict__
-        NAO_TOKEN = ["state", "id", "name", "icon", "startdate", "birthdate"]
+        nao_token = ["state", "id", "name", "icon", "startdate", "birthdate"]
         for dict_key in dict_employee:
             datatype = dict_key.split("_")[-1]
-            if datatype not in NAO_TOKEN:
+            if datatype not in nao_token:
                 tokenized_data = requests.post(
                     url=f"http://127.0.0.1:3700/tokenize/{datatype}",
                     data=json.dumps({datatype: dict_employee[dict_key]}),

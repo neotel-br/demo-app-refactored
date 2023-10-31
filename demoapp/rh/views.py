@@ -4,6 +4,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from .models import *
 from django.contrib.auth.decorators import login_required
+import requests
+import json
 
 
 # Create your views here.
@@ -14,17 +16,48 @@ def index(request):
 
 
 def get_employees(request, department_id):
+    data_type = {
+        "cpf": [],
+        "rg": [],
+        "salary": [],
+        "email": [],
+        "phone": [],
+        "bank": [],
+        "agency": [],
+        "cc": [],
+    }
+
     if request.method == "GET":
         employees_filter = Employee.objects.filter(department=department_id)
-        department = list(Department.objects.filter(id=department_id).values())
-        employees = list(employees_filter.values())
+        department = Department.objects.filter(id=department_id).values()
+        employees = employees_filter.values()
+        nao_token = ["id", "name", "icon", "startdate", "birthdate", "department"]
         i = 0
         for employee in employees_filter:
             employees[i]["employee_titlejob"] = employee.employee_titlejob.position_name
             employees[i]["employee_department"] = employee.department.department_name
+
+            for key_value in employees[i].keys():
+                json_value = key_value.split("_")[-1]
+                if json_value not in nao_token:
+                    for field_type in data_type:
+                        if field_type in key_value:
+                            data_type[field_type].append(
+                                {field_type: employees[i][key_value]}
+                            )
             i += 1
 
-        return JsonResponse({"employees": employees, "department": department})
+        detokenized_data = {}
+        for field_type, values in data_type.items():
+            response = requests.post(
+                url=f"http://127.0.0.1:3700/detokenize/{field_type}?clear=true",
+                data=json.dumps(values),
+            ).json()
+            detokenized_data[field_type] = response
+
+        return JsonResponse(
+            {"employees": list(employees), "department": list(department)}
+        )
     else:
         return JsonResponse({"message_error": "Error"})
 
