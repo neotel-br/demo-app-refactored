@@ -75,10 +75,10 @@ class Employee(models.Model):
 
                     dict_employee[dict_key] = tokenized_data["token"]
         self.is_tokenized = True
-
-        while True:
-            id = random.randint(10001, 99999)
-            if Employee.objects.filter(employee_id=id).count() == 0:
-                break
-        self.employee_id = id
+        if not self.employee_id:
+            while True:
+                id = random.randint(10001, 99999)
+                if not Employee.objects.filter(employee_id=id).exists():
+                    self.employee_id = id
+                    break
         super(Employee, self).save(*args, **kwargs)
