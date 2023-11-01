@@ -41,6 +41,7 @@ class Employee(models.Model):
     employee_bank = models.CharField(max_length=50)
     employee_agency = models.CharField(max_length=50)
     employee_cc = models.CharField(max_length=50)
+    is_tokenized = models.BooleanField(default=False)
 
     def __str__(self):
         # dict_employee = self.__dict__
@@ -51,18 +52,29 @@ class Employee(models.Model):
         return f"{self.employee_name} #{self.employee_id}"
 
     def save(self, *args, **kwargs):
-        dict_employee = self.__dict__
-        nao_token = ["state", "id", "name", "icon", "startdate", "birthdate"]
-        for dict_key in dict_employee:
-            datatype = dict_key.split("_")[-1]
-            if datatype not in nao_token:
-                tokenized_data = requests.post(
-                    url=f"http://127.0.0.1:3700/tokenize/{datatype}",
-                    data=json.dumps({datatype: dict_employee[dict_key]}),
-                ).json()
+        if not self.is_tokenized:
+            dict_employee = self.__dict__
+            nao_token = [
+                "state",
+                "id",
+                "name",
+                "icon",
+                "startdate",
+                "birthdate",
+                "tokenized",
+            ]
+            for dict_key in dict_employee:
+                datatype = dict_key.split("_")[-1]
+                if datatype not in nao_token:
+                    tokenized_data = requests.post(
+                        url=f"http://127.0.0.1:3700/tokenize/{datatype}",
+                        data=json.dumps({datatype: dict_employee[dict_key]}),
+                    ).json()
 
-                dict_employee[dict_key] = tokenized_data["token"]
-                print(dict_employee)
+                    print(tokenized_data)
+
+                    dict_employee[dict_key] = tokenized_data["token"]
+        self.is_tokenized = True
 
         while True:
             id = random.randint(10001, 99999)

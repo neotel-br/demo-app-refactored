@@ -46,15 +46,39 @@ def get_employees(request, department_id):
                                 {field_type: employees[i][key_value]}
                             )
             i += 1
-
-        print(employees)
         detokenized_data = {}
+
+        if request.user.username == "gerente" or request.user.username == "admin":
+            clear = "true"
+
+        else:
+            clear = "false"
+
         for field_type, values in data_type.items():
             response = requests.post(
-                url=f"http://127.0.0.1:3700/detokenize/{field_type}?clear=true",
+                url=f"http://127.0.0.1:3700/detokenize/{field_type}?clear={clear}",
                 data=json.dumps(values),
             ).json()
             detokenized_data[field_type] = response
+
+        for i, employee in enumerate(employees):
+            data_list = [
+                "cpf",
+                "rg",
+                "salary",
+                "email",
+                "phone",
+                "bank",
+                "agency",
+                "cc",
+            ]
+            for data_field in data_list:
+                employee_field = f"employee_{data_field}"
+                if data_field in detokenized_data:
+                    print(detokenized_data)
+                    employee[employee_field] = detokenized_data[data_field][i]["data"]
+
+        print(employees)
 
         return JsonResponse({"employees": employees, "department": list(department)})
     else:
