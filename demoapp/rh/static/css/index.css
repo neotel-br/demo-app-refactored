@@ -55,7 +55,7 @@ Default: 9px
 .main{
     max-width:170rem;
     margin: 3.2rem auto;
-    height: 75vh;
+    min-height: 75vh;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -118,7 +118,6 @@ Default: 9px
     background-color: #748FFC;
     border-radius: 0.8rem;
     padding: 3.2rem ;
-    height: 100%;
 }
 
 /* View Department Employees */
