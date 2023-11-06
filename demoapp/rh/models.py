@@ -71,8 +71,6 @@ class Employee(models.Model):
                         data=json.dumps({datatype: dict_employee[dict_key]}),
                     ).json()
 
-                    print(tokenized_data)
-
                     dict_employee[dict_key] = tokenized_data["token"]
         self.is_tokenized = True
         if not self.employee_id:

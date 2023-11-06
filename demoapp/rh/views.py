@@ -75,10 +75,7 @@ def get_employees(request, department_id):
             for data_field in data_list:
                 employee_field = f"employee_{data_field}"
                 if data_field in detokenized_data:
-                    print(detokenized_data)
                     employee[employee_field] = detokenized_data[data_field][i]["data"]
-
-        print(employees)
 
         return JsonResponse({"employees": employees, "department": list(department)})
     else:
