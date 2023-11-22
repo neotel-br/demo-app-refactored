@@ -56,16 +56,21 @@ class Employee(models.Model):
             dict_employee = self.__dict__
             nao_token = [
                 "state",
-                "id",
+                "_state",
                 "name",
                 "icon",
                 "startdate",
                 "birthdate",
                 "tokenized",
             ]
+
+            dict_employee.pop("id")
+            dict_employee.pop("employee_titlejob_id")
+            dict_employee.pop("department_id")
             for dict_key in dict_employee:
                 datatype = dict_key.split("_")[-1]
                 if datatype not in nao_token:
+                    print(datatype)
                     tokenized_data = requests.post(
                         url=f"http://127.0.0.1:3700/tokenize/{datatype}",
                         data=json.dumps({datatype: dict_employee[dict_key]}),

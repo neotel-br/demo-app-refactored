@@ -2,22 +2,30 @@ document.addEventListener("DOMContentLoaded", function(event) {
     // set event for each department button
     departments = document.querySelectorAll(".department")
     departments.forEach(department => {
-        department.addEventListener("click", () => {
-            // assures that view employee is hidden and department employees is not
-            document.querySelector('.page-department-employees').classList.remove("hidden")
-            document.querySelector('.page-view-employee').classList.add("hidden")
-            
-            // checks if the department isn't already clicked by checking the title
-            btn_dept = department.firstElementChild
-            current_dept = document.querySelector('#id-h1').innerText
-            if (current_dept != department.id) {
-                // It removes the employees from the department view
-                clearEmployees()
-                
-                // Fetch employees from a department and displays it
-                getEmployees(btn_dept)
-            }
-        })
+      department.addEventListener("click", () => {
+        // assures that view employee is hidden and department employees is not
+        document.querySelector('.page-department-employees').classList.remove("hidden")
+        document.querySelector('.page-view-employee').classList.add("hidden")
+        
+        // checks if the department isn't already clicked by checking the title
+        btn_dept = department.firstElementChild
+        current_dept = document.querySelector('#id-h1').innerText
+        if (current_dept != department.id) {
+          // It removes the employees from the department view
+          clearEmployees()
+           
+          // Fetch employees from a department and displays it
+          getEmployees(btn_dept).then(data => {
+            checkListEmployees(data)
+          })
+          
+          
+          getDepartment(btn_dept).then(data => {
+            changeDepartmentTitle(data.department_name) 
+          })
+
+        }
+      })
     })
     
     // sets first department to be clicked as default
@@ -27,33 +35,63 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
 
-function getEmployees(department) {
-    department_id = department.id
-    fetch('/get/employees/' + department_id, {
-        method: 'GET',
+async function getEmployees(department) { 
+  try{
+    const response = await fetch('/api/employees/department/' + department.id, {
+      method: 'GET',
     })
-        .then(response => response.json())
-        .then(data => {
-            // checks if employees aren't created, if not, then displays it
-            if (!Object.keys(data).length == 0) {
-                for (let i = 0; i < Object.keys(data.employees).length; i++) {
-                    var isCreated = verifyIfObjectAreCreated(data.employees[i], data.employees[i].employee_id)
-                    if(!isCreated){
-                      viewCardEmployee(data.employees[i])
-                    }
-                }
-            }
-            // changes the title of the department
-            changeTitleDepartment(data.department[0].department_name)
-        })
-        .catch(e => {
-            console.log("Error: " + e)
-        })
+    const data = await response.json()
+    return data 
+  } catch(error){
+    console.error("Error: " + error)
+    throw error
+  }
+
 }
 
-function changeTitleDepartment(department_name) {
-    h1_title = document.querySelector('#id-h1')
-    h1_title.innerText = department_name
+async function getDepartment(department){
+  try{
+    const response = await fetch('/api/departments/' + department.id, {
+      method: 'GET',
+    })
+    const data = await response.json()
+    return data 
+  } catch(error){
+    console.error("Error: " + error)
+    throw error
+  }
+}
+
+function changeDepartmentTitle(department_name){
+  h1_title = document.querySelector('#id-h1')
+  h1_title.innerText = department_name
+}
+
+function checkListEmployees(data){
+  if (!Object.keys(data).length == 0) {
+    for (let i = 0; i < Object.keys(data).length; i++) {
+      var isCreated = verifyIfObjectAreCreated(data[i], data[i].employee_id)
+      if(!isCreated){
+        viewCardEmployee(data[i])
+      }
+    }
+  }
+}
+
+function verifyIfObjectAreCreated(employee, id) {
+    all_ids = document.querySelectorAll('.id-employee')
+    count = 0
+
+    for (let index = 0; index < all_ids.length; index++) {
+        if (all_ids[index].innerText == id) {
+            count++
+        }
+    }
+
+    if (!count > 0) {
+      return false
+    }
+    return true
 }
 
 function viewCardEmployee(employee) {
@@ -81,7 +119,7 @@ function viewCardEmployee(employee) {
 
     const img_emp = document.createElement("img")
     img_emp.className = "employee-pic"
-    img_emp.src = '/images/' + employee.employee_icon
+    img_emp.src = employee.employee_icon
     div_emp_pic.append(img_emp)
 
     const p_name = document.createElement("p")
@@ -118,30 +156,66 @@ function clearEmployees() {
     }
 }
 
-function verifyIfObjectAreCreated(employee, id) {
-    all_ids = document.querySelectorAll('.id-employee')
-    count = 0
-
-    for (let index = 0; index < all_ids.length; index++) {
-        if (all_ids[index].innerText == id) {
-            count++
-        }
-    }
-
-    if (!count > 0) {
-      return false
-    }
-    return true
-}
-
-
 function togglePage(employee) {
-    // toggles between page department employees and shows page view employee
-    hiddenClass()
-    // displays the employee info
-    viewInfoEmployee(employee)
+  // toggles between page department employees and shows page view employee
+  hiddenClass()
+  // displays the employee info
+  let tokenizedData
+  getTokenizedEmployee(employee.id)
+  .then((employeeData) => {
+    tokenizedData = employeeData
+    //console.log(tokenizedData)
+    return detokenizeData(tokenizedData)
+  })
+  .then((detokenizedData) => {
+    viewInfoEmployee(detokenizedData)
+  })
+  .catch((error) => {
+    console.log("Error: ", error)
+  })
 }
 
+async function detokenizeData(tokenizedData){
+  try{
+    const csrftoken = getCookie('csrftoken')
+    const response = await fetch('/api/detokenize/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify(tokenizedData),
+    })
+
+    const data = await response.json()
+
+    return data
+  
+  } catch(error){
+    console.error("Error: " + error)
+    throw error
+  }
+}
+
+
+async function getTokenizedEmployee(employee_id){
+  try{
+    const response = await fetch('/api/employees/' + employee_id, {
+      method: 'GET',
+    })
+    const data = await response.json()
+    return data 
+  } catch(error){
+    console.error("Error: " + error)
+    throw error
+  }
+}
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
 
 function hiddenClass() {
     document.querySelector('.page-department-employees').classList.toggle("hidden")
@@ -149,23 +223,23 @@ function hiddenClass() {
 }
 
 function viewInfoEmployee(employee) {
-    employee_pic = document.querySelector(".pic-view").src = "images/" + employee.employee_icon
-    employee_name = document.querySelector(".employee-name").innerText = employee.employee_name
-    var employee_title_job = document.querySelector(".employee-title-job").innerText = employee.employee_titlejob
-    var employee_id = document.querySelector(".employee-id").innerText = employee.employee_id
-    var employee_cpf = document.querySelector(".employee-cpf").innerText = "CPF: " + employee.employee_cpf
-    var employee_rg = document.querySelector(".employee-rg").innerText = "RG: " + employee.employee_rg
-    var employee_birthdate = document.querySelector(".employee-birthdate ").innerText = "Data de Nascimento: " + employee.employee_birthdate
-    var employee_startdate = document.querySelector(".employee-startdate").innerText = "Data de Admissão: " + employee.employee_startdate
-    var employee_salary = document.querySelector(".employee-salary").innerText = "Salário: " + employee.employee_salary
-    var employee_department = document.querySelector(".employee-department").innerText = "Setor: " + employee.employee_department
-    var employee_email = document.querySelector(".employee-email").innerText = "E-mail: " + employee.employee_email
-    var employee_phone = document.querySelector(".employee-phone").innerText = "Telefone: " + employee.employee_phone
-    var employee_agency = document.querySelector(".employee-agency").value = employee.employee_agency
-    var employee_cc = document.querySelector(".employee-cc").value = employee.employee_cc
+  employee_pic = document.querySelector(".pic-view").src = employee.employee_icon
+  employee_name = document.querySelector(".employee-name").innerText = employee.employee_name
+  var employee_title_job = document.querySelector(".employee-title-job").innerText = employee.employee_titlejob
+  var employee_id = document.querySelector(".employee-id").innerText = employee.employee_id
+  var employee_cpf = document.querySelector(".employee-cpf").innerText = "CPF: " + employee.employee_cpf
+  var employee_rg = document.querySelector(".employee-rg").innerText = "RG: " + employee.employee_rg
+  var employee_birthdate = document.querySelector(".employee-birthdate ").innerText = "Data de Nascimento: " + employee.employee_birthdate
+  var employee_startdate = document.querySelector(".employee-startdate").innerText = "Data de Admissão: " + employee.employee_startdate
+  var employee_salary = document.querySelector(".employee-salary").innerText = "Salário: " + employee.employee_salary
+  var employee_department = document.querySelector(".employee-department").innerText = "Setor: " + employee.employee_department
+  var employee_email = document.querySelector(".employee-email").innerText = "E-mail: " + employee.employee_email
+  var employee_phone = document.querySelector(".employee-phone").innerText = "Telefone: " + employee.employee_phone
+  var employee_agency = document.querySelector(".employee-agency").value = employee.employee_agency
+  var employee_cc = document.querySelector(".employee-cc").value = employee.employee_cc
 
-    document.querySelector("#return").addEventListener("click", () => {
-        document.querySelector('.page-department-employees').classList.remove("hidden")
-        document.querySelector('.page-view-employee').classList.add("hidden")
-    })
+  document.querySelector("#return").addEventListener("click", () => {
+      document.querySelector('.page-department-employees').classList.remove("hidden")
+      document.querySelector('.page-view-employee').classList.add("hidden")
+  })
 }
