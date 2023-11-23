@@ -161,18 +161,35 @@ function togglePage(employee) {
   hiddenClass()
   // displays the employee info
   let tokenizedData
-  getTokenizedEmployee(employee.id)
-  .then((employeeData) => {
-    tokenizedData = employeeData
-    //console.log(tokenizedData)
-    return detokenizeData(tokenizedData)
-  })
-  .then((detokenizedData) => {
-    viewInfoEmployee(detokenizedData)
-  })
-  .catch((error) => {
-    console.log("Error: ", error)
-  })
+  name = document.querySelector(".employee-name").innerText
+  
+  
+  if(name != employee.employee_name){
+    clearViewInfoEmployee()
+    getTokenizedEmployee(employee.id)
+    .then((employeeData) => {
+      tokenizedData = employeeData
+      //console.log(tokenizedData)
+      return detokenizeData(tokenizedData)
+    })
+    .then((detokenizedData) => {
+      viewInfoEmployee(detokenizedData)
+    })
+    .catch((error) => {
+      console.log("Error: ", error)
+    })
+  }
+  else{
+    getTokenizedEmployee(employee.id)
+    .then((employeeData) => {
+      viewInfoEmployee(detokenizedData)
+    })
+    .catch((error) => {
+      console.log("Error: ", error)
+    })
+
+  }
+  i++
 }
 
 async function detokenizeData(tokenizedData){
@@ -196,6 +213,7 @@ async function detokenizeData(tokenizedData){
     throw error
   }
 }
+
 
 
 async function getTokenizedEmployee(employee_id){
@@ -222,7 +240,24 @@ function hiddenClass() {
     document.querySelector('.page-view-employee').classList.toggle("hidden")
 }
 
-function viewInfoEmployee(employee) {
+function clearViewInfoEmployee(){
+
+  employee_name = document.querySelector(".employee-name").innerText = "Employee"
+  var employee_title_job = document.querySelector(".employee-title-job").innerText = "Titlejob"
+  var employee_id = document.querySelector(".employee-id").innerText = "#"
+  var employee_cpf = document.querySelector(".employee-cpf").innerText = "CPF: "
+  var employee_rg = document.querySelector(".employee-rg").innerText = "RG: "
+  var employee_birthdate = document.querySelector(".employee-birthdate ").innerText = "Data de Nascimento: "
+  var employee_startdate = document.querySelector(".employee-startdate").innerText = "Data de Admissão: "
+  var employee_salary = document.querySelector(".employee-salary").innerText = "Salário: "
+  var employee_department = document.querySelector(".employee-department").innerText = "Setor: "
+  var employee_email = document.querySelector(".employee-email").innerText = "E-mail: " 
+  var employee_phone = document.querySelector(".employee-phone").innerText = "Telefone: " 
+  var employee_agency = document.querySelector(".employee-agency").value = "" 
+  var employee_cc = document.querySelector(".employee-cc").value = "" 
+}
+
+function viewInfoEmployee(employee, default_pic) {
   employee_pic = document.querySelector(".pic-view").src = employee.employee_icon
   employee_name = document.querySelector(".employee-name").innerText = employee.employee_name
   var employee_title_job = document.querySelector(".employee-title-job").innerText = employee.employee_titlejob
