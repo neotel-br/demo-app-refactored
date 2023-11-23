@@ -19,35 +19,37 @@
     </div>
 
 </div>
+
 <div class='article'>
   <div class="page-department-employees">
     <div class="title-department">
         <h1 id="id-h1">Departamento</h1>
     </div>
     <div class="container-employees">
-        <!-- <div class="employee"> -->
-        <!--     <div class="picture-info-employee"> -->
-        <!--         <div class="employee-picture"> -->
-        <!--             <img src="{% static 'images/sanuka.png' %}" alt=""> -->
-        <!--         </div> -->
-        <!--         <div class="employee-info"> -->
-        <!--             <p class="name">Sanuka LambeLambe<p> -->
-        <!--             <p class="title-job">Analista de Segurança<p> -->
-        <!--             <p class="id-employee">420<p> -->
-        <!---->
-        <!--         </div> -->
-        <!--     </div> -->
-        <!--     <div class="employee-btn-view"> -->
-  <!--         <button type="button">View</button> -->
-        <!--     </div> -->
-        <!-- </div> -->
+        <div class="employee">
+            <div class="picture-info-employee">
+                <div class="employee-picture">
+                    <img src="{% static 'images/sanuka.png' %}" alt="">
+                </div>
+                <div class="employee-info">
+                    <p class="name">Sanuka LambeLambe<p>
+                    <p class="title-job">Analista de Segurança<p>
+                    <p class="id-employee">420<p>
+
+                </div>
+            </div>
+            <div class="employee-btn-view">
+          <button type="button">View</button>
+            </div>
+        </div>
 
     </div>
   </div>
   <div class="page-view-employee hidden">
     <div class="employee-display-data">
       <div class="employee-pic-info">
-        <img class="employee-pic pic-view" src="{% static 'images/profile-photo.svg'%}">
+        <div class="container-image skeleton">
+        </div>
         <div class="employee-info">
           <p class="employee-name"></p>
           <p class="employee-title-job"></p>
@@ -60,9 +62,9 @@
     </div>
     <div class="employee-personal-data">
       <div>
-        <p class="employee-cpf"></p>
-        <p class="employee-rg"></p>
-        <p class="employee-birthdate"></p>
+        <p class="employee-cpf "></p>
+        <p class="employee-rg "></p>
+        <p class="employee-birthdate "></p>
       </div>
       <div>
         <p class="employee-startdate"></p>
@@ -79,9 +81,9 @@
       <h2>Dados Bancários</h2>
       <div class="bank-data-div">
         <label>Agência</label>
-        <input type="text" class="employee-agency" disabled></input>
+        <input type="text" class="employee-agency skeleton" disabled></input>
         <label>Conta Corrente</label>
-        <input type="text" class="employee-cc" disabled></input>
+        <input type="text" class="employee-cc skeleton" disabled></input>
       </div>
     </div>
   </div>

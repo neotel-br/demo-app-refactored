@@ -53,26 +53,26 @@ Default: 9px
 */
 
 .main{
-    max-width:170rem;
-    margin: 3.2rem auto;
-    min-height: 75vh;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+  max-width:170rem;
+  margin: 3.2rem auto;
+  min-height: 75vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 /* Sidebar */
 .sidebar{
-    background-color: #748FFC;
-    width: 10%;
-    justify-content: flex-start;
-    border-radius: 0.8rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 2.4rem 0;
-
+  background-color: #748FFC;
+  width: 10%;
+  justify-content: flex-start;
+  border-radius: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2.4rem 0;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 
 .departments{
@@ -113,11 +113,12 @@ Default: 9px
 
 /* Article */
 .article{
-    width: 70%;
-    justify-content: flex-end;
-    background-color: #748FFC;
-    border-radius: 0.8rem;
-    padding: 3.2rem ;
+  width: 70%;
+  justify-content: flex-end;
+  background-color: #748FFC;
+  border-radius: 0.8rem;
+  padding: 3.2rem ;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 
 /* View Department Employees */
@@ -215,6 +216,14 @@ Default: 9px
   display: flex;
   height: fit-content;
   gap: 1.8rem;
+  align-items: center;
+}
+
+.employee-pic-info .container-image{
+  border-radius: 50%;
+  height:9.6rem;
+  outline: 2px solid #748FFC;
+  width:9.6rem;
 }
 
 .employee-btn-back button{
@@ -237,7 +246,7 @@ Default: 9px
   color: white;
   font-weight: bold;
 }
-
+#748FFC
 .bank-data h2{
     color: white;
     background-color: #748FFC;
@@ -261,6 +270,22 @@ Default: 9px
     width: 9.6rem;
     max-width: 100%;
     border-radius: 50%;
+    outline: 1px solid #748FFC;
+}
+
+
+
+.skeleton{
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(200, 20%, 70%);
+  }
+  100%{
+    background-color: hsl(200, 20%, 95%);
+  }
 }
 
 .employee-name{
