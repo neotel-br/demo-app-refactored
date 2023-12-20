@@ -273,7 +273,7 @@ function viewInfoEmployee(employee) {
   var employee_birthdate = document.querySelector(".employee-birthdate ").innerText = "Data de Nascimento: " + employee.employee_birthdate
   var employee_startdate = document.querySelector(".employee-startdate").innerText = "Data de Admissão: " + employee.employee_startdate
   var employee_salary = document.querySelector(".employee-salary").innerText = "Salário: " + employee.employee_salary
-  var employee_department = document.querySelector(".employee-department").innerText = "Setor: " + employee.employee_department
+  var employee_department = document.querySelector(".employee-department").innerText = "Setor: " + employee.department.department_name
   var employee_email = document.querySelector(".employee-email").innerText = "E-mail: " + employee.employee_email
   var employee_phone = document.querySelector(".employee-phone").innerText = "Telefone: " + employee.employee_phone
   var employee_agency = document.querySelector(".employee-agency").value = employee.employee_agency
