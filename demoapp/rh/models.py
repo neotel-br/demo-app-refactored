@@ -52,25 +52,27 @@ class Employee(models.Model):
         return f"{self.employee_name} #{self.employee_id}"
 
     def save(self, *args, **kwargs):
+        if not self.employee_id:
+            while True:
+                id = random.randint(10001, 99999)
+                if not Employee.objects.filter(employee_id=id).exists():
+                    self.employee_id = id
+                    break
         if not self.is_tokenized:
             dict_employee = self.__dict__
             nao_token = [
                 "state",
                 "_state",
                 "name",
-                "icon",
                 "startdate",
                 "birthdate",
+                "icon",
                 "tokenized",
+                "id",
             ]
-
-            dict_employee.pop("id")
-            dict_employee.pop("employee_titlejob_id")
-            dict_employee.pop("department_id")
             for dict_key in dict_employee:
                 datatype = dict_key.split("_")[-1]
                 if datatype not in nao_token:
-                    print(datatype)
                     tokenized_data = requests.post(
                         url=f"http://127.0.0.1:3700/tokenize/{datatype}",
                         data=json.dumps({datatype: dict_employee[dict_key]}),
@@ -78,10 +80,4 @@ class Employee(models.Model):
 
                     dict_employee[dict_key] = tokenized_data["token"]
         self.is_tokenized = True
-        if not self.employee_id:
-            while True:
-                id = random.randint(10001, 99999)
-                if not Employee.objects.filter(employee_id=id).exists():
-                    self.employee_id = id
-                    break
         super(Employee, self).save(*args, **kwargs)

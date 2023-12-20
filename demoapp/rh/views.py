@@ -17,6 +17,7 @@ def index(request):
     return render(request, "rh/index.html", {"departments": departments})
 
 
+@login_required
 @api_view()
 def get_employee(request, employee_id):
     employee = Employee.objects.get(id=employee_id)
@@ -24,6 +25,7 @@ def get_employee(request, employee_id):
     return Response(serializer.data)
 
 
+@login_required
 @api_view()
 def get_employees(request, department_id):
     employees = Employee.objects.filter(department_id=department_id)
@@ -32,6 +34,7 @@ def get_employees(request, department_id):
     return Response(serializer.data)
 
 
+@login_required
 @api_view()
 def get_department(request, department_id):
     department = Department.objects.get(id=department_id)
@@ -40,6 +43,7 @@ def get_department(request, department_id):
     return Response(serializer.data)
 
 
+@login_required
 @api_view(["POST"])
 def detokenize(request):
     try:
@@ -48,14 +52,12 @@ def detokenize(request):
         detokenize_key = {
             "employee_agency": "agency",
             "employee_bank": "bank",
-            "employee_birthdate": "birthdate",
             "employee_cc": "cc",
             "employee_cpf": "cpf",
             "employee_email": "email",
             "employee_phone": "phone",
             "employee_rg": "rg",
             "employee_salary": "salary",
-            "employee_startdate": "startdate",
         }
 
         clear = "false"
@@ -73,7 +75,6 @@ def detokenize(request):
                     data=json.dumps({detokenize_key[item]: employee_data[item]}),
                 ).json()
                 employee_data[item] = response["data"]
-
         return Response(employee_data)
     except ValueError:
         return Response({"Error": "Invalid JSON format"})

@@ -169,7 +169,6 @@ function togglePage(employee) {
     getTokenizedEmployee(employee.id)
     .then((employeeData) => {
       tokenizedData = employeeData
-      console.log(employeeData)
       //console.log(tokenizedData)
       return detokenizeData(tokenizedData)
     })
@@ -183,7 +182,6 @@ function togglePage(employee) {
   else{
     getTokenizedEmployee(employee.id)
     .then((employeeData) => {
-      console.log(employeeData)
       viewInfoEmployee(detokenizedData)
     })
     .catch((error) => {
@@ -244,6 +242,7 @@ function hiddenClass() {
 function clearViewInfoEmployee(){
   var container_image = document.querySelector(".container-image")
   container_image.removeChild(container_image.firstChild) 
+  container_image.classList.add('skeleton')
   var employee_name = document.querySelector(".employee-name").innerText = ""
   var employee_title_job = document.querySelector(".employee-title-job").innerText = ""
   var employee_id = document.querySelector(".employee-id").innerText = ""
@@ -255,8 +254,12 @@ function clearViewInfoEmployee(){
   var employee_department = document.querySelector(".employee-department").innerText = ""
   var employee_email = document.querySelector(".employee-email").innerText = "" 
   var employee_phone = document.querySelector(".employee-phone").innerText = "" 
-  var employee_agency = document.querySelector(".employee-agency").value = "" 
-  var employee_cc = document.querySelector(".employee-cc").value = "" 
+  var employee_agency = document.querySelector(".employee-agency") 
+  employee_agency.value = ""
+  employee_agency.classList.add('skeleton')
+  var employee_cc = document.querySelector(".employee-cc") 
+  employee_cc.value = ""
+  employee_cc.classList.add('skeleton')
 }
 
 function viewInfoEmployee(employee) {
