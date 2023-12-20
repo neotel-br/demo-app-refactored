@@ -264,7 +264,9 @@ function viewInfoEmployee(employee) {
   var employee_pic = document.createElement("img")
   employee_pic.src = employee.employee_icon
   employee_pic.className = "employee-pic"
-  document.querySelector('.container-image').appendChild(employee_pic)
+  var container_img = document.querySelector('.container-image')
+  container_img.appendChild(employee_pic)
+  container_img.classList.remove('skeleton')
   var employee_name = document.querySelector(".employee-name").innerText = employee.employee_name
   var employee_title_job = document.querySelector(".employee-title-job").innerText = employee.employee_titlejob.position_name
   var employee_id = document.querySelector(".employee-id").innerText = employee.employee_id
@@ -276,8 +278,12 @@ function viewInfoEmployee(employee) {
   var employee_department = document.querySelector(".employee-department").innerText = "Setor: " + employee.department.department_name
   var employee_email = document.querySelector(".employee-email").innerText = "E-mail: " + employee.employee_email
   var employee_phone = document.querySelector(".employee-phone").innerText = "Telefone: " + employee.employee_phone
-  var employee_agency = document.querySelector(".employee-agency").value = employee.employee_agency
-  var employee_cc = document.querySelector(".employee-cc").value = employee.employee_cc
+  var employee_agency = document.querySelector(".employee-agency")
+  employee_agency.value = employee.employee_agency
+  employee_agency.classList.remove("skeleton")
+  var employee_cc = document.querySelector(".employee-cc")
+  employee_cc.value = employee.employee_cc
+  employee_cc.classList.remove("skeleton")
 
   document.querySelector("#return").addEventListener("click", () => {
       document.querySelector('.page-department-employees').classList.remove("hidden")
