@@ -129,7 +129,7 @@ function viewCardEmployee(employee) {
     p_name.className = "name"
     p_name.innerText = employee.employee_name
     p_titlejob.className = "title-job"
-    p_titlejob.innerText = employee.employee_titlejob
+    p_titlejob.innerText = employee.employee_titlejob.position_name
     p_id_emp.className = "id-employee"
     p_id_emp.innerText = employee.employee_id
 
@@ -169,6 +169,7 @@ function togglePage(employee) {
     getTokenizedEmployee(employee.id)
     .then((employeeData) => {
       tokenizedData = employeeData
+      console.log(employeeData)
       //console.log(tokenizedData)
       return detokenizeData(tokenizedData)
     })
@@ -182,6 +183,7 @@ function togglePage(employee) {
   else{
     getTokenizedEmployee(employee.id)
     .then((employeeData) => {
+      console.log(employeeData)
       viewInfoEmployee(detokenizedData)
     })
     .catch((error) => {
@@ -240,9 +242,7 @@ function hiddenClass() {
 }
 
 function clearViewInfoEmployee(){
-  console.log("Clear")
   var container_image = document.querySelector(".container-image")
-  console.log(container_image)
   container_image.removeChild(container_image.firstChild) 
   var employee_name = document.querySelector(".employee-name").innerText = ""
   var employee_title_job = document.querySelector(".employee-title-job").innerText = ""
@@ -266,7 +266,7 @@ function viewInfoEmployee(employee) {
   employee_pic.className = "employee-pic"
   document.querySelector('.container-image').appendChild(employee_pic)
   var employee_name = document.querySelector(".employee-name").innerText = employee.employee_name
-  var employee_title_job = document.querySelector(".employee-title-job").innerText = employee.employee_titlejob
+  var employee_title_job = document.querySelector(".employee-title-job").innerText = employee.employee_titlejob.position_name
   var employee_id = document.querySelector(".employee-id").innerText = employee.employee_id
   var employee_cpf = document.querySelector(".employee-cpf").innerText = "CPF: " + employee.employee_cpf
   var employee_rg = document.querySelector(".employee-rg").innerText = "RG: " + employee.employee_rg
