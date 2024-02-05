@@ -141,7 +141,7 @@ function viewCardEmployee(employee) {
 
     const btn = document.createElement("button")
     btn.type = "button"
-    btn.innerText = "View"
+    btn.innerText = "Visualizar"
     div_emp_btn_view.append(btn)
 
     const div_cont_emp = document.querySelector(".container-employees")

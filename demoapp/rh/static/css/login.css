@@ -8,9 +8,9 @@
 
 .section-login{
   width: 90%;
-  background-color: #748FFC;
+  background-color: #292F33;
   border-radius: 0.8rem;
-  padding: 3.2rem;
+  padding: 2.4rem;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -20,8 +20,8 @@
 form{
   display: flex;
   flex-direction: column;
-  gap: 3.2rem;
-  width: 70%;
+  gap: 6.2rem;
+  width: 50%;
 }
 
 form h1{
@@ -31,13 +31,14 @@ form h1{
 }
 
 form button{
-    background-color: #4DABF7;
+    background-color: #748FFC;
     text-decoration: none;
     border: none;
     color: white;
     border-radius: 0.8rem;
-    padding:1.2rem 3.2rem;
+    padding: 1.2rem 3.2rem;
     cursor: pointer;
+    font-weight: 700;
 }
 
 .field{

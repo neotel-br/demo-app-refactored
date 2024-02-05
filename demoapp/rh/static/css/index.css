@@ -61,10 +61,11 @@ Default: 9px
   justify-content: space-around;
 }
 
+
 /* Sidebar */
 .sidebar{
-  background-color: #748FFC;
-  width: 10%;
+  background-color: #292F33;
+  width: 8%;
   justify-content: flex-start;
   border-radius: 0.8rem;
   display: flex;
@@ -84,23 +85,27 @@ Default: 9px
 }
 
 .btn-sidebar{
-    background-color: #EDF2FF;
-    border-radius: 0.8rem;
-    padding: 1.6rem;
     cursor: pointer;
-    opacity: 0.8;
-    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    opacity: 0.8; 
+    width: 100%;
+}
+
+.btn-sidebar p{
+  font-size: 1.8rem;
+  color: white;
+  font-weight: 700;
 }
 
 .btn-sidebar:hover{
-    background-color: #3B5BDB;
     opacity: 1;
 }
 
 .sidebar img{
   max-width: 100%;
   width: 4.8rem;
-
 }
 
 .logout{
@@ -115,7 +120,7 @@ Default: 9px
 .article{
   width: 70%;
   justify-content: flex-end;
-  background-color: #748FFC;
+  background-color: #292F33;
   border-radius: 0.8rem;
   padding: 3.2rem ;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
@@ -157,6 +162,7 @@ Default: 9px
     background-color: #748FFC;
     text-decoration: none;
     border: none;
+    font-weight: 700;
     color: white;
     border-radius: 0.8rem;
     padding:1.2rem 3.2rem;
@@ -241,12 +247,12 @@ Default: 9px
   display: flex;
   justify-content: space-between;
   padding: 2.4rem;
-  background-color: #748FFC;
+  background-color: #292F33;
   border-radius: 0.8rem;
   color: white;
   font-weight: bold;
 }
-#748FFC
+
 .bank-data h2{
     color: white;
     background-color: #748FFC;
