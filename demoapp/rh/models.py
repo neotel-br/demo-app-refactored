@@ -1,5 +1,6 @@
 from django.db import models
 import requests
+from demoapp.settings import env
 import random
 import json
 
@@ -74,7 +75,7 @@ class Employee(models.Model):
                 datatype = dict_key.split("_")[-1]
                 if datatype not in nao_token:
                     tokenized_data = requests.post(
-                        url=f"http://127.0.0.1:3700/tokenize/{datatype}",
+                        url=f"http://{env('CTS_IP')}:{env('CTS_PORT')}/tokenize/{datatype}",
                         data=json.dumps({datatype: dict_employee[dict_key]}),
                     ).json()
 

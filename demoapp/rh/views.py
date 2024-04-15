@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from .models import *
+from demoapp.settings import env
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 import json
@@ -71,7 +72,7 @@ def detokenize(request):
         for item in employee_data:
             if item in detokenize_key:
                 response = requests.post(
-                    url=f"http://127.0.0.1:3700/detokenize/{detokenize_key[item]}?clear={clear}",
+                    url=f"http://{env('CTS_IP')}:{env('CTS_PORT')}/detokenize/{detokenize_key[item]}?clear={clear}",
                     data=json.dumps({detokenize_key[item]: employee_data[item]}),
                 ).json()
                 employee_data[item] = response["data"]
