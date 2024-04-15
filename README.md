@@ -20,11 +20,9 @@ Demo app refactored
 
 Secret key generator: https://djecrety.ir/
     
-### Migrate
-    python3 manage.py makemigrations rh
-    python3 manage.py migrate
+### Run container
+    docker-compose up
 
-### Run project
-    python3 manage.py runserver
+Test on 0.0.0.0:8000
 
 
