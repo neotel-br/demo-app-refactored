@@ -6,9 +6,6 @@ Demo app refactored
 
 ## How to Run Project
 
-### Install requirements.txt
-    pip install -r requirements.txt
-
 ### Set .env file
     touch .env
     
