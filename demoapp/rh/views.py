@@ -72,7 +72,7 @@ def detokenize(request):
         for item in employee_data:
             if item in detokenize_key:
                 response = requests.post(
-                    url=f"http://{env('CTS_IP')}:{env('CTS_PORT')}/detokenize/{detokenize_key[item]}?clear={clear}",
+                    url=f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/detokenize/{detokenize_key[item]}?clear={clear}",
                     data=json.dumps({detokenize_key[item]: employee_data[item]}),
                 ).json()
                 employee_data[item] = response["data"]

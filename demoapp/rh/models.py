@@ -75,7 +75,7 @@ class Employee(models.Model):
                 datatype = dict_key.split("_")[-1]
                 if datatype not in nao_token:
                     tokenized_data = requests.post(
-                        url=f"http://{env('CTS_IP')}:{env('CTS_PORT')}/tokenize/{datatype}",
+                        url=f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/tokenize/{datatype}",
                         data=json.dumps({datatype: dict_employee[dict_key]}),
                     ).json()
 
