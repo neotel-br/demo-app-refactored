@@ -15,4 +15,5 @@ services:
       - ./demoapp/db.sqlite3/:/demoapp/db.sqlite3/
     env_file:
       - ./demoapp/demoapp/.env
+    restart: always
 
