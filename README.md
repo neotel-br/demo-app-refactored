@@ -3,6 +3,7 @@ Demo app refactored
 
 ## Requirements
 - python3
+- docker
 
 ## How to Run Project
 
