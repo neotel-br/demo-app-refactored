@@ -13,8 +13,8 @@ Demo app refactored
 ## Edit file
     SECRET_KEY=*GENERATE A SECRET KEY*
     DEBUG=TRUE
-    CTS_IP=
-    CTS_PORT=
+    MICROTOKEN_IP=
+    MICROTOKEN_PORT=
 
 Secret key generator: https://djecrety.ir/
     
