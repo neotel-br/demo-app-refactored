@@ -4,6 +4,7 @@ Demo app refactored
 ## Requirements
 - python3
 - docker
+- microtoken
 
 ## How to Run Project
 
