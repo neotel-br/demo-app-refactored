@@ -21,6 +21,7 @@ Demo app refactored
 Secret key generator: https://djecrety.ir/
     
 ### Run container
+    cd demo-app-refactored/
     docker-compose up
 
 Test on 0.0.0.0:8000
