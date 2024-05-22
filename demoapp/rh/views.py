@@ -104,15 +104,15 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                logger.info(f"{user.username} logged in.")
+                logger.info(f"operation: login status: success user: {user.username}")
                 return redirect("index")
-            else:
-                logger.error("Username or password incorrect.")
-                return redirect("login")
+        else:
+            logger.error("operation: login status: fail reason: username or password incorrect")
+            return redirect("login")
     return render(request, "rh/login.html", {"form": form})
 
 
 def logout_view(request):
-    logger.info(f"{request.user.username} logged out.")
+    logger.info(f"operation: logout status: success user: {request.user.username}")
     logout(request)
     return redirect("login")
