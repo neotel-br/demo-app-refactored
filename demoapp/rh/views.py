@@ -65,10 +65,7 @@ def detokenize(request):
 
         clear = "false"
 
-        if request.user.username == "analista":
-            clear = "false"
-
-        if request.user.username == "gerente" or request.user == "admin":
+        if request.user.username == "gerente" or request.user.username == "admin":
             clear = "true"
 
         for item in employee_data:
