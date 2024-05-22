@@ -9,6 +9,7 @@ Demo app refactored
 ## How to Run Project
 
 ### Set .env file
+    cd demo-app-refactored/demoapp/demoapp
     touch .env
     
 ## Edit file
@@ -20,6 +21,7 @@ Demo app refactored
 Secret key generator: https://djecrety.ir/
     
 ### Run container
+    cd demo-app-refactored/
     docker-compose up
 
 Test on 0.0.0.0:8000
