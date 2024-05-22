@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import environ
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -139,3 +140,22 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = "/login/"
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        # Define a console handler
+        'console': {
+            'level': 'INFO',  # Adjust the log level as needed
+            'class': 'logging.StreamHandler',  # Use a StreamHandler to log to the console
+        },
+    },
+    'loggers': {
+        # Root logger configuration
+        '': {
+            'handlers': ['console'],  # Use the console handler for all loggers
+            'level': 'INFO',  # Set the root logger level
+            'propagate': True,
+        },
+    },
+}

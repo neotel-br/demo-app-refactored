@@ -5,11 +5,13 @@ from .models import *
 from demoapp.settings import env
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
+import logging
 import json
 import requests
 from rest_framework.response import Response
 from .serializers import DepartmentSerializer, EmployeeSerializer
 
+logger = logging.getLogger("loggers")
 
 # Create your views here.
 @login_required()
@@ -74,10 +76,24 @@ def detokenize(request):
                 response = requests.post(
                     url=f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/detokenize/{detokenize_key[item]}?clear={clear}",
                     data=json.dumps({detokenize_key[item]: employee_data[item]}),
-                ).json()
-                employee_data[item] = response["data"]
+                )
+                if response.status_code == 200 and response.json()['status'] != "error":
+                    employee_data[item] = response.json()["data"]
+                    success_message = f"key type: {item} status: {response.json()['status']}"
+                    logger.info(success_message)
+                elif response.json()['status'] == "error":
+                    error_message = f"key type: {item} status: {response.json()['status']} reason: {response.json()['reason']}"
+                    logger.error(error_message)
+                    return Response({"Error": error_message})
+                else:
+                    error_message = response.json()['error']
+                    logger.error(error_message)
+                    return Response({"Error": error_message})
+
+        logger.info("Detokenized employee data successfully.")
         return Response(employee_data)
     except ValueError:
+        logger.error("Invalid JSON format")
         return Response({"Error": "Invalid JSON format"})
 
 
@@ -90,14 +106,15 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
+                logger.info(f"{user.username} logged in.")
                 return redirect("index")
             else:
+                logger.error("Username or password incorrect.")
                 return redirect("login")
-    else:
-        print(request.POST)
     return render(request, "rh/login.html", {"form": form})
 
 
 def logout_view(request):
+    logger.info(f"{request.user.username} logged out.")
     logout(request)
     return redirect("login")
