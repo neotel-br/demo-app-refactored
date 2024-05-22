@@ -9,7 +9,6 @@ Demo app refactored
 ## How to Run Project
 
 ### Set .env file
-    cd demo-app-refactored/demoapp/demoapp
     touch .env
     
 ## Edit file
