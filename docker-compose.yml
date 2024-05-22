@@ -4,16 +4,12 @@ services:
   demoapp:
     container_name: demoapp
     build:
-      context: .
+      context: ./demo-app-refactored/
       dockerfile: ./Dockerfile
     ports:
       - 8000:8000
     volumes:
-      - ./demoapp:/demoapp:Z
-      - ./demoapp/static/:/demoapp/static/
-      - ./demoapp/uploads/:/demoapp/uploads/
-      - ./demoapp/db.sqlite3/:/demoapp/db.sqlite3/
+      - ./demo-app-refactored/demoapp:/demoapp:Z
     env_file:
-      - ./demoapp/demoapp/.env
+      - ./.env
     restart: always
-
