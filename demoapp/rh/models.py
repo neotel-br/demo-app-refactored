@@ -2,8 +2,10 @@ from django.db import models
 import requests
 from demoapp.settings import env
 import random
+import logging
 import json
 
+logger = logging.getLogger("loggers")
 
 class Department(models.Model):
     department_name = models.CharField(max_length=30)
@@ -74,11 +76,23 @@ class Employee(models.Model):
             for dict_key in dict_employee:
                 datatype = dict_key.split("_")[-1]
                 if datatype not in nao_token:
-                    tokenized_data = requests.post(
+                    response = requests.post(
                         url=f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/tokenize/{datatype}",
                         data=json.dumps({datatype: dict_employee[dict_key]}),
-                    ).json()
+                    )
 
-                    dict_employee[dict_key] = tokenized_data["token"]
+                    if response.status_code == 200 and response.json()['status'] != "error":
+                        dict_employee[dict_key] = response.json()["token"]
+                        success_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']}"
+                        logger.info(success_message)
+                    elif response.json()['status'] == "error":
+                        error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} reason: {response.json()['reason']}"
+                        return logger.error(error_message)
+                    else:
+                        error_message = response.json()['error']
+                        return logger.error(error_message)
+
+                    logger.info("Tokenized employee data successfully.")
+
         self.is_tokenized = True
         super(Employee, self).save(*args, **kwargs)

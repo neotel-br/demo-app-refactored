@@ -148,6 +148,13 @@ LOGGING = {
         'console': {
             'level': 'INFO',  # Adjust the log level as needed
             'class': 'logging.StreamHandler',  # Use a StreamHandler to log to the console
+            'formatter': 'standard',
+        },
+    },
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(message)s',  # Include timestamp in the log message
+            'datefmt': '%Y-%m-%d %H:%M:%S',  # Format the timestamp as desired
         },
     },
     'loggers': {

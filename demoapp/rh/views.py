@@ -79,10 +79,10 @@ def detokenize(request):
                 )
                 if response.status_code == 200 and response.json()['status'] != "error":
                     employee_data[item] = response.json()["data"]
-                    success_message = f"key type: {item} status: {response.json()['status']}"
+                    success_message = f"operation: detokenize key type: {item} status: {response.json()['status']}"
                     logger.info(success_message)
                 elif response.json()['status'] == "error":
-                    error_message = f"key type: {item} status: {response.json()['status']} reason: {response.json()['reason']}"
+                    error_message = f"operation: detokenize key type: {item} status: {response.json()['status']} reason: {response.json()['reason']}"
                     logger.error(error_message)
                     return Response({"Error": error_message})
                 else:
