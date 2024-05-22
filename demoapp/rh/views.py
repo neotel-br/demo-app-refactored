@@ -86,7 +86,7 @@ def detokenize(request):
                     logger.error(error_message)
                     return Response({"Error": error_message})
                 else:
-                    error_message = response.json()['error']
+                    error_message = f"operation: detokenize key type: {item} status: {response.json()['status']} reason: {response.json()['error']}"
                     logger.error(error_message)
                     return Response({"Error": error_message})
 

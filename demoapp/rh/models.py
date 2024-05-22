@@ -89,10 +89,10 @@ class Employee(models.Model):
                         error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} reason: {response.json()['reason']}"
                         return logger.error(error_message)
                     else:
-                        error_message = response.json()['error']
+                        error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} error: {response.json()['error']}"
                         return logger.error(error_message)
 
-                    logger.info("Tokenized employee data successfully.")
+            logger.info("Tokenized employee data successfully.")
 
         self.is_tokenized = True
         super(Employee, self).save(*args, **kwargs)
