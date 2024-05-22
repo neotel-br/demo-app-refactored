@@ -75,21 +75,22 @@ class Employee(models.Model):
             ]
             for dict_key in dict_employee:
                 datatype = dict_key.split("_")[-1]
+                url = f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/tokenize/{datatype}"
                 if datatype not in nao_token:
                     response = requests.post(
-                        url=f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/tokenize/{datatype}",
+                        url=url,
                         data=json.dumps({datatype: dict_employee[dict_key]}),
                     )
 
                     if response.status_code == 200 and response.json()['status'] != "error":
                         dict_employee[dict_key] = response.json()["token"]
-                        success_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']}"
+                        success_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} endpoint: {url}"
                         logger.info(success_message)
                     elif response.json()['status'] == "error":
-                        error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} reason: {response.json()['reason']}"
+                        error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} reason: {response.json()['reason']} endpoint: {url}"
                         return logger.error(error_message)
                     else:
-                        error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} error: {response.json()['error']}"
+                        error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} error: {response.json()['error']} endpoint: {url}"
                         return logger.error(error_message)
 
             logger.info("Tokenized employee data successfully.")

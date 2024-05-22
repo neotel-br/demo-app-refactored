@@ -73,20 +73,21 @@ def detokenize(request):
 
         for item in employee_data:
             if item in detokenize_key:
+                url = f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/detokenize/{detokenize_key[item]}?clear={clear}"
                 response = requests.post(
-                    url=f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/detokenize/{detokenize_key[item]}?clear={clear}",
+                    url=url,
                     data=json.dumps({detokenize_key[item]: employee_data[item]}),
                 )
                 if response.status_code == 200 and response.json()['status'] != "error":
                     employee_data[item] = response.json()["data"]
-                    success_message = f"operation: detokenize key type: {item} status: {response.json()['status']}"
+                    success_message = f"operation: detokenize clear: {clear} key type: {item} status: {response.json()['status']} user: {request.user.username} endpoint: {url}"
                     logger.info(success_message)
                 elif response.json()['status'] == "error":
-                    error_message = f"operation: detokenize key type: {item} status: {response.json()['status']} reason: {response.json()['reason']}"
+                    error_message = f"operation: detokenize clear: {clear} key type: {item} status: {response.json()['status']} reason: {response.json()['reason']} user: {request.user.username} endpoint: {url}"
                     logger.error(error_message)
                     return Response({"Error": error_message})
                 else:
-                    error_message = f"operation: detokenize key type: {item} status: {response.json()['status']} reason: {response.json()['error']}"
+                    error_message = f"operation: detokenize clear: {clear} key type: {item} status: {response.json()['status']} error: {response.json()['error']} user: {request.user.username} endpoint: {url}"
                     logger.error(error_message)
                     return Response({"Error": error_message})
 
