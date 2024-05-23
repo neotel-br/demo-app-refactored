@@ -71,6 +71,7 @@ class Employee(models.Model):
                 "birthdate",
                 "icon",
                 "tokenized",
+                "salary",
                 "id",
             ]
             for dict_key in dict_employee:

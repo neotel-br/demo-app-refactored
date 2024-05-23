@@ -60,7 +60,6 @@ def detokenize(request):
             "employee_email": "email",
             "employee_phone": "phone",
             "employee_rg": "rg",
-            "employee_salary": "salary",
         }
 
         clear = "false"
