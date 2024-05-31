@@ -8,6 +8,7 @@ media
 migrations
 
 uploads/
+static/
 
 # Backup files #
 *.bak
