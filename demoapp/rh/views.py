@@ -51,7 +51,6 @@ def get_department(request, department_id):
 def detokenize(request):
     try:
         employee_data = request.data
-
         detokenize_key = {
             "employee_agency": "agency",
             "employee_bank": "bank",
