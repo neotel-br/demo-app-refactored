@@ -4,8 +4,8 @@ services:
   demoapp:
     container_name: demoapp
     build:
-      context: ./demo-app-refactored/
-      dockerfile: ./Dockerfile
+      context: ./
+      dockerfile: Dockerfile
     ports:
       - 8000:8000
     volumes:
