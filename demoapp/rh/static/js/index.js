@@ -119,7 +119,7 @@ function viewCardEmployee(employee) {
 
     const img_emp = document.createElement("img")
     img_emp.className = "employee-pic"
-    img_emp.src = employee.employee_icon
+    img_emp.src = "/static/images/pessoa.png"
     div_emp_pic.append(img_emp)
 
     const p_name = document.createElement("p")
@@ -265,7 +265,7 @@ function clearViewInfoEmployee(){
 function viewInfoEmployee(employee) {
 
   var employee_pic = document.createElement("img")
-  employee_pic.src = employee.employee_icon
+  employee_pic.src = "/static/images/pessoa.png"
   employee_pic.className = "employee-pic"
   var container_img = document.querySelector('.container-image')
   container_img.appendChild(employee_pic)

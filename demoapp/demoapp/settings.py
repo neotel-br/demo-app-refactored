@@ -34,7 +34,7 @@ if os.path.isfile(dotenv_file):
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG") 
+DEBUG = "TRUE"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -140,28 +140,28 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "/login/"
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
         # Define a console handler
-        'console': {
-            'level': 'INFO',  # Adjust the log level as needed
-            'class': 'logging.StreamHandler',  # Use a StreamHandler to log to the console
-            'formatter': 'standard',
+        "console": {
+            "level": "INFO",  # Adjust the log level as needed
+            "class": "logging.StreamHandler",  # Use a StreamHandler to log to the console
+            "formatter": "standard",
         },
     },
-    'formatters': {
-        'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(message)s',  # Include timestamp in the log message
-            'datefmt': '%Y-%m-%d %H:%M:%S',  # Format the timestamp as desired
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s [%(levelname)s] %(message)s",  # Include timestamp in the log message
+            "datefmt": "%Y-%m-%d %H:%M:%S",  # Format the timestamp as desired
         },
     },
-    'loggers': {
+    "loggers": {
         # Root logger configuration
-        '': {
-            'handlers': ['console'],  # Use the console handler for all loggers
-            'level': 'INFO',  # Set the root logger level
-            'propagate': True,
+        "": {
+            "handlers": ["console"],  # Use the console handler for all loggers
+            "level": "INFO",  # Set the root logger level
+            "propagate": True,
         },
     },
 }

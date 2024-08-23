@@ -1,0 +1,135 @@
+[
+    {
+        "model": "rh.department",
+        "pk": 1,
+        "fields": {
+            "department_name": "TI",
+            "department_icon": "/static/images/mdi_computer.png"
+        }
+    },
+    {
+        "model": "rh.department",
+        "pk": 2,
+        "fields": {
+            "department_name": "Financeiro",
+            "department_icon": "/static/images/financeiro.png"
+        }
+    },
+    {
+        "model": "rh.position",
+        "pk": 1,
+        "fields": {
+            "position_name": "Analista de Cybersegurança",
+            "department": 1
+        }
+    },
+    {
+        "model": "rh.position",
+        "pk": 2,
+        "fields": {
+            "position_name": "Gerente de Cybersegurança",
+            "department": 1
+        }
+    },
+    {
+        "model": "rh.position",
+        "pk": 3,
+        "fields": {
+            "position_name": "Analista de Financeiro",
+            "department": 2
+        }
+    },
+    {
+        "model": "rh.position",
+        "pk": 4,
+        "fields": {
+            "position_name": "Gerente de Financeiro",
+            "department": 2
+        }
+    },
+    {
+        "model": "rh.employee",
+        "pk": 1,
+        "fields": {
+            "employee_name": "João Silva",
+            "department": 1,
+            "employee_titlejob": 1,
+            "employee_id": "10001",
+            "employee_cpf": "12345678900",
+            "employee_rg": "4212345678",
+            "employee_birthdate": "1990-01-01",
+            "employee_startdate": "2023-01-01",
+            "employee_salary": "5000",
+            "employee_email": "joao.silva@example.com",
+            "employee_phone": "11999990000",
+            "employee_bank": "Banco do Brasil",
+            "employee_agency": "0001",
+            "employee_cc": "123456",
+            "is_tokenized": false
+        }
+    },
+    {
+        "model": "rh.employee",
+        "pk": 2,
+        "fields": {
+            "employee_name": "Maria Souza",
+            "department": 1,
+            "employee_titlejob": 2,
+            "employee_id": "10002",
+            "employee_cpf": "98765432100",
+            "employee_rg": "3498765432",
+            "employee_birthdate": "1985-02-02",
+            "employee_startdate": "2023-02-01",
+            "employee_salary": "8000",
+            "employee_email": "maria.souza@example.com",
+            "employee_phone": "988880000",
+            "employee_bank": "Itaú",
+            "employee_agency": "1234",
+            "employee_cc": "654321",
+            "is_tokenized": false
+        }
+    },
+    {
+        "model": "rh.employee",
+        "pk": 3,
+        "fields": {
+            "employee_name": "Carlos Pereira",
+            "department": 2,
+            "employee_titlejob": 3,
+            "employee_id": "10003",
+            "employee_cpf": "55566677788",
+            "employee_rg": "7655666777",
+            "employee_birthdate": "1992-03-03",
+            "employee_startdate": "2023-03-01",
+            "employee_salary": "4500",
+            "employee_email": "carlos.pereira@example.com",
+            "employee_phone": "21977770000",
+            "employee_bank": "Caixa Econômica",
+            "employee_agency": "5678",
+            "employee_cc": "987654",
+            "is_tokenized": false
+        }
+    },
+    {
+        "model": "rh.employee",
+        "pk": 4,
+        "fields": {
+            "employee_name": "Ana Oliveira",
+            "department": 2,
+            "employee_titlejob": 4,
+            "employee_id": "10004",
+            "employee_cpf": "44433322211",
+            "employee_rg": "5444333222",
+            "employee_birthdate": "1988-04-04",
+            "employee_startdate": "2023-04-01",
+            "employee_salary": "9000",
+            "employee_email": "ana.oliveira@example.com",
+            "employee_phone": "51966660000",
+            "employee_bank": "Bradesco",
+            "employee_agency": "9101",
+            "employee_cc": "321098",
+            "is_tokenized": false
+        }
+    }
+]
+

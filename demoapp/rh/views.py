@@ -13,6 +13,7 @@ from .serializers import DepartmentSerializer, EmployeeSerializer
 
 logger = logging.getLogger("loggers")
 
+
 # Create your views here.
 @login_required()
 def index(request):
@@ -68,16 +69,16 @@ def detokenize(request):
 
         for item in employee_data:
             if item in detokenize_key:
-                url = f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/detokenize/{detokenize_key[item]}?clear={clear}"
+                url = f"http://{env('IP')}:{env('MICROTOKEN_PORT')}/detokenize/{detokenize_key[item]}?clear={clear}"
                 response = requests.post(
                     url=url,
                     data=json.dumps({detokenize_key[item]: employee_data[item]}),
                 )
-                if response.status_code == 200 and response.json()['status'] != "error":
+                if response.status_code == 200 and response.json()["status"] != "error":
                     employee_data[item] = response.json()["data"]
                     success_message = f"operation: detokenize clear: {clear} key type: {item} status: {response.json()['status']} user: {request.user.username} endpoint: {url}"
                     logger.info(success_message)
-                elif response.json()['status'] == "error":
+                elif response.json()["status"] == "error":
                     error_message = f"operation: detokenize clear: {clear} key type: {item} status: {response.json()['status']} reason: {response.json()['reason']} user: {request.user.username} endpoint: {url}"
                     logger.error(error_message)
                     return Response({"Error": error_message})
@@ -105,7 +106,9 @@ def login_view(request):
                 logger.info(f"operation: login status: success user: {user.username}")
                 return redirect("index")
         else:
-            logger.error("operation: login status: fail reason: username or password incorrect")
+            logger.error(
+                "operation: login status: fail reason: username or password incorrect"
+            )
             return redirect("login")
     return render(request, "rh/login.html", {"form": form})
 

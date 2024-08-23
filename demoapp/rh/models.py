@@ -7,6 +7,7 @@ import json
 
 logger = logging.getLogger("loggers")
 
+
 class Department(models.Model):
     department_name = models.CharField(max_length=30)
     department_icon = models.ImageField(upload_to="rh/static/images/uploads", null=True)
@@ -25,7 +26,6 @@ class Position(models.Model):
 
 class Employee(models.Model):
     employee_name = models.CharField(max_length=100)
-    employee_icon = models.ImageField(upload_to="rh/static/images/uploads", null=True)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     employee_titlejob = models.ForeignKey("Position", on_delete=models.CASCADE)
     employee_id = models.CharField(
@@ -83,11 +83,14 @@ class Employee(models.Model):
                         data=json.dumps({datatype: dict_employee[dict_key]}),
                     )
 
-                    if response.status_code == 200 and response.json()['status'] != "error":
+                    if (
+                        response.status_code == 200
+                        and response.json()["status"] != "error"
+                    ):
                         dict_employee[dict_key] = response.json()["token"]
                         success_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} endpoint: {url}"
                         logger.info(success_message)
-                    elif response.json()['status'] == "error":
+                    elif response.json()["status"] == "error":
                         error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} reason: {response.json()['reason']} endpoint: {url}"
                         return logger.error(error_message)
                     else:
