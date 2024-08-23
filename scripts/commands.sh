@@ -13,8 +13,8 @@ python manage.py shell <<EOF
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-username = "admin"
-password = "N3oS3nh@2021"
+username = "$DJANGO_SUPERUSER_USERNAME"
+password = "$DJANGO_SUPERUSER_PASSWORD"
 email = "admin@example.com"
 
 if not User.objects.filter(username=username).exists():
