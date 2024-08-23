@@ -9,13 +9,14 @@ Demo app refactored
 ## How to Run Project
 
 ### Set .env file
-    touch .env
+    touch demo-app-refactored/.env
     
 ## Edit file
-    SECRET_KEY=*GENERATE A SECRET KEY*
-    DEBUG=TRUE
-    MICROTOKEN_IP=
-    MICROTOKEN_PORT=
+    DJANGO_SUPERUSER_USERNAME=""
+    DJANGO_SUPERUSER_PASSWORD=""
+    SECRET_KEY="<GENERATE A SECRET KEY>"
+    IP=""
+    MICROTOKEN_PORT=""
 
 Secret key generator: https://djecrety.ir/
     
