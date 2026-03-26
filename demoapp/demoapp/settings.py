@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 import environ
 
@@ -27,16 +28,24 @@ dotenv_file = os.path.join(BASE_DIR, ".env")
 if os.path.isfile(dotenv_file):
     load_dotenv(dotenv_file)
 
+
+def env_first(*keys, default=None):
+    for key in keys:
+        value = os.getenv(key)
+        if value not in (None, ""):
+            return value
+    return default
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = env("SECRET_KEY", default="unsafe-dev-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = "TRUE"
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
 CORS_ALLOW_ALL_ORIGINS = True
 # Application definition
@@ -85,10 +94,13 @@ WSGI_APPLICATION = "demoapp.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DATABASE_DIR = Path("/demoapp/data")
+DATABASE_DIR.mkdir(parents=True, exist_ok=True)
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": str(DATABASE_DIR / "db.sqlite3"),
     }
 }
 
@@ -138,6 +150,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = "/login/"
+
+MICROTOKEN_HOST = env_first("MICROTOKEN_HOST", "MICROTOKEN_IP", "IP", default="127.0.0.1")
+MICROTOKEN_PORT = env("MICROTOKEN_PORT", default="8001")
+MICROTOKEN_BASE_URL = f"http://{MICROTOKEN_HOST}:{MICROTOKEN_PORT}"
 
 LOGGING = {
     "version": 1,

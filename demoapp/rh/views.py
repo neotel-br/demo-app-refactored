@@ -2,14 +2,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from .models import *
-from demoapp.settings import env
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
+from rest_framework import status
 import logging
-import json
-import requests
 from rest_framework.response import Response
 from .serializers import DepartmentSerializer, EmployeeSerializer
+from .microtoken import MicrotokenError, call_microtoken
 
 logger = logging.getLogger("loggers")
 
@@ -69,29 +68,37 @@ def detokenize(request):
 
         for item in employee_data:
             if item in detokenize_key:
-                url = f"http://{env('IP')}:{env('MICROTOKEN_PORT')}/detokenize/{detokenize_key[item]}?clear={clear}"
-                response = requests.post(
-                    url=url,
-                    data=json.dumps({detokenize_key[item]: employee_data[item]}),
+                try:
+                    response_data = call_microtoken(
+                        f"/detokenize/{detokenize_key[item]}?clear={clear}",
+                        {detokenize_key[item]: employee_data[item]},
+                        operation="detokenize",
+                        field_name=item,
+                        extra_log_context=f" user: {request.user.username}",
+                    )
+                except MicrotokenError as exc:
+                    return Response({"error": str(exc)}, status=exc.status_code)
+
+                detokenized_value = response_data.get("data")
+                if detokenized_value is None:
+                    message = f"Microtoken API returned no data for {item}."
+                    logger.error("%s user: %s", message, request.user.username)
+                    return Response({"error": message}, status=status.HTTP_502_BAD_GATEWAY)
+
+                employee_data[item] = detokenized_value
+                logger.info(
+                    "operation: detokenize clear: %s key type: %s status: %s user: %s",
+                    clear,
+                    item,
+                    response_data.get("status", "success"),
+                    request.user.username,
                 )
-                if response.status_code == 200 and response.json()["status"] != "error":
-                    employee_data[item] = response.json()["data"]
-                    success_message = f"operation: detokenize clear: {clear} key type: {item} status: {response.json()['status']} user: {request.user.username} endpoint: {url}"
-                    logger.info(success_message)
-                elif response.json()["status"] == "error":
-                    error_message = f"operation: detokenize clear: {clear} key type: {item} status: {response.json()['status']} reason: {response.json()['reason']} user: {request.user.username} endpoint: {url}"
-                    logger.error(error_message)
-                    return Response({"Error": error_message})
-                else:
-                    error_message = f"operation: detokenize clear: {clear} key type: {item} status: {response.json()['status']} error: {response.json()['error']} user: {request.user.username} endpoint: {url}"
-                    logger.error(error_message)
-                    return Response({"Error": error_message})
 
         logger.info("Detokenized employee data successfully.")
         return Response(employee_data)
     except ValueError:
         logger.error("Invalid JSON format")
-        return Response({"Error": "Invalid JSON format"})
+        return Response({"error": "Invalid JSON format"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def login_view(request):

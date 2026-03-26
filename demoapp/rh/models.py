@@ -1,9 +1,9 @@
 from django.db import models
-import requests
-from demoapp.settings import env
+from django.core.exceptions import ValidationError
 import random
 import logging
-import json
+
+from .microtoken import MicrotokenError, call_microtoken
 
 logger = logging.getLogger("loggers")
 
@@ -76,28 +76,31 @@ class Employee(models.Model):
             ]
             for dict_key in dict_employee:
                 datatype = dict_key.split("_")[-1]
-                url = f"http://{env('MICROTOKEN_IP')}:{env('MICROTOKEN_PORT')}/tokenize/{datatype}"
                 if datatype not in nao_token:
-                    response = requests.post(
-                        url=url,
-                        data=json.dumps({datatype: dict_employee[dict_key]}),
-                    )
+                    try:
+                        response_data = call_microtoken(
+                            f"/tokenize/{datatype}",
+                            {datatype: dict_employee[dict_key]},
+                            operation="tokenize",
+                            field_name=dict_key,
+                        )
+                    except MicrotokenError as exc:
+                        raise ValidationError(str(exc)) from exc
 
-                    if (
-                        response.status_code == 200
-                        and response.json()["status"] != "error"
-                    ):
-                        dict_employee[dict_key] = response.json()["token"]
-                        success_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} endpoint: {url}"
-                        logger.info(success_message)
-                    elif response.json()["status"] == "error":
-                        error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} reason: {response.json()['reason']} endpoint: {url}"
-                        return logger.error(error_message)
-                    else:
-                        error_message = f"operation: tokenize key type: {dict_key} status: {response.json()['status']} error: {response.json()['error']} endpoint: {url}"
-                        return logger.error(error_message)
+                    token = response_data.get("token")
+                    if not token:
+                        message = f"Microtoken API returned no token for {dict_key}."
+                        logger.error(message)
+                        raise ValidationError(message)
+
+                    dict_employee[dict_key] = token
+                    logger.info(
+                        "operation: tokenize key type: %s status: %s",
+                        dict_key,
+                        response_data.get("status", "success"),
+                    )
 
             logger.info("Tokenized employee data successfully.")
 
         self.is_tokenized = True
-        super(Employee, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
