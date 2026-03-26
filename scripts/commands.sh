@@ -7,6 +7,23 @@ mkdir -p /demoapp/data /demoapp/static
 
 echo "Applying migrations and collecting static files"
 python3 manage.py migrate --noinput
+
+echo "Validating application tables"
+python3 manage.py shell <<EOF
+from django.db import connection
+
+required_tables = {"rh_department", "rh_position", "rh_employee"}
+existing_tables = set(connection.introspection.table_names())
+missing_tables = sorted(required_tables - existing_tables)
+
+if missing_tables:
+    raise SystemExit(
+        "Missing application tables after migrate: "
+        + ", ".join(missing_tables)
+        + ". Rebuild the image and, if needed, reset volumes with 'docker compose down -v'."
+    )
+EOF
+
 python3 manage.py collectstatic --noinput --clear
 
 if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
@@ -41,7 +58,9 @@ EOF
 # Populate the database if no data exists
 if [ "$DATA_EXISTS" = "no" ]; then
     echo "Populating the database..."
-    python3 manage.py loaddata initial_data.json
+    if ! python3 manage.py loaddata initial_data.json; then
+        echo "Warning: initial_data.json could not be loaded. Continuing deploy without seed data."
+    fi
 else
     echo "Data already exists. Skipping loaddata."
 fi

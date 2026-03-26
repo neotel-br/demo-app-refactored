@@ -32,7 +32,7 @@ On the first boot, the container will:
 - apply tracked Django migrations
 - collect static files
 - create the configured superuser if credentials are set
-- load `initial_data.json` only when the database is empty
+- try to load `initial_data.json` only when the database is empty, without failing the deploy if seed loading breaks
 
 Open `http://127.0.0.1:8000`.
 
@@ -44,6 +44,7 @@ Open `http://127.0.0.1:8000`.
 - Static files are stored in the Docker volume `demoapp_static`.
 - If the database volume is empty, seed data is loaded automatically.
 - If the database volume already exists, startup keeps the current data and only runs migrations.
+- The deploy uses committed Django migrations. It does not generate migrations during container startup.
 
 ## Reset To Blank State
 
