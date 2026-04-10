@@ -1,13 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
+from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework import status
 import logging
 from rest_framework.response import Response
-from .serializers import DepartmentSerializer, EmployeeSerializer
+from .serializers import DepartmentSerializer, EmployeeSerializer, PositionSerializer
 from .microtoken import MicrotokenError, call_microtoken
 
 logger = logging.getLogger("loggers")
@@ -20,7 +22,15 @@ def index(request):
     return render(request, "rh/index.html", {"departments": departments})
 
 
-@login_required
+# Removed @login_required for API access
+@api_view()
+def get_all_employees(request):
+    employees = Employee.objects.all()
+    serializer = EmployeeSerializer(employees, many=True)
+    return Response(serializer.data)
+
+
+# Removed @login_required for API access
 @api_view()
 def get_employee(request, employee_id):
     employee = Employee.objects.get(id=employee_id)
@@ -28,7 +38,7 @@ def get_employee(request, employee_id):
     return Response(serializer.data)
 
 
-@login_required
+# Removed @login_required for API access
 @api_view()
 def get_employees(request, department_id):
     employees = Employee.objects.filter(department_id=department_id)
@@ -37,7 +47,7 @@ def get_employees(request, department_id):
     return Response(serializer.data)
 
 
-@login_required
+# Removed @login_required for API access
 @api_view()
 def get_department(request, department_id):
     department = Department.objects.get(id=department_id)
@@ -46,7 +56,7 @@ def get_department(request, department_id):
     return Response(serializer.data)
 
 
-@login_required
+# Removed @login_required for API access
 @api_view(["POST"])
 def detokenize(request):
     try:
@@ -124,3 +134,164 @@ def logout_view(request):
     logger.info(f"operation: logout status: success user: {request.user.username}")
     logout(request)
     return redirect("login")
+
+
+@api_view(["POST"])
+def register_user(request):
+    """
+    Register a new user account
+    Expected data: name, email, username, password
+    """
+    try:
+        data = request.data
+        
+        # Validate required fields
+        required_fields = ["name", "email", "username", "password"]
+        for field in required_fields:
+            if not data.get(field):
+                return Response(
+                    {"error": f"{field} é obrigatório"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        # Check if username already exists
+        if User.objects.filter(username=data["username"]).exists():
+            return Response(
+                {"error": "Nome de usuário já está em uso"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if email already exists
+        if User.objects.filter(email=data["email"]).exists():
+            return Response(
+                {"error": "E-mail já está em uso"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create user
+        user = User.objects.create_user(
+            username=data["username"],
+            email=data["email"],
+            password=data["password"],
+            first_name=data.get("name", ""),
+        )
+        
+        logger.info(f"operation: register status: success user: {user.username}")
+        
+        return Response(
+            {
+                "message": "Usuário criado com sucesso",
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "name": user.first_name,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+    except Exception as e:
+        logger.error(f"operation: register status: fail error: {str(e)}")
+        return Response(
+            {"error": "Erro ao criar usuário"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(["POST"])
+def create_employee(request):
+    """
+    Create a new employee
+    Expected data: employee_name, department_id, position_id, employee_cpf, employee_rg,
+                   employee_birthdate, employee_startdate, employee_salary,
+                   employee_email, employee_phone, employee_bank, employee_agency, employee_cc
+    """
+    try:
+        data = request.data
+        
+        # Validate required fields
+        required_fields = [
+            "employee_name", "department_id", "position_id", "employee_cpf", "employee_rg",
+            "employee_birthdate", "employee_startdate", "employee_salary",
+            "employee_email", "employee_phone", "employee_bank", "employee_agency", "employee_cc"
+        ]
+        
+        for field in required_fields:
+            if not data.get(field):
+                return Response(
+                    {"error": f"{field} é obrigatório"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        # Get department and position
+        try:
+            department = Department.objects.get(id=data["department_id"])
+            position = Position.objects.get(id=data["position_id"])
+        except Department.DoesNotExist:
+            return Response(
+                {"error": "Departamento não encontrado"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Position.DoesNotExist:
+            return Response(
+                {"error": "Cargo não encontrado"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Create employee
+        employee = Employee.objects.create(
+            employee_name=data["employee_name"],
+            department=department,
+            employee_titlejob=position,
+            employee_cpf=data["employee_cpf"],
+            employee_rg=data["employee_rg"],
+            employee_birthdate=data["employee_birthdate"],
+            employee_startdate=data["employee_startdate"],
+            employee_salary=data["employee_salary"],
+            employee_email=data["employee_email"],
+            employee_phone=data["employee_phone"],
+            employee_bank=data["employee_bank"],
+            employee_agency=data["employee_agency"],
+            employee_cc=data["employee_cc"],
+        )
+        
+        logger.info(f"operation: create_employee status: success employee: {employee.employee_name} id: {employee.employee_id}")
+        
+        serializer = EmployeeSerializer(employee)
+        return Response(
+            {
+                "message": "Funcionário criado com sucesso",
+                "employee": serializer.data
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+    except Exception as e:
+        logger.error(f"operation: create_employee status: fail error: {str(e)}")
+        return Response(
+            {"error": f"Erro ao criar funcionário: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(["GET"])
+def list_departments(request):
+    """List all departments"""
+    departments = Department.objects.all()
+    serializer = DepartmentSerializer(departments, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def list_positions(request):
+    """List all positions"""
+    department_id = request.query_params.get('department_id')
+    
+    if department_id:
+        positions = Position.objects.filter(department_id=department_id)
+    else:
+        positions = Position.objects.all()
+    
+    serializer = PositionSerializer(positions, many=True)
+    return Response(serializer.data)

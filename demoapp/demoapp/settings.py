@@ -47,11 +47,32 @@ DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS Settings
+CORS_ALLOW_ALL_ORIGINS = env.bool("CORS_ALLOW_ALL_ORIGINS", default=True)
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+]
+
+# CSRF Settings - trust frontend origins
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+]
 # Application definition
 
 INSTALLED_APPS = [
     "rest_framework",
+    "corsheaders",
     "rh",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -62,6 +83,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -154,6 +176,12 @@ LOGIN_URL = "/login/"
 MICROTOKEN_HOST = env_first("MICROTOKEN_HOST", "MICROTOKEN_IP", "IP", default="127.0.0.1")
 MICROTOKEN_PORT = env("MICROTOKEN_PORT", default="8001")
 MICROTOKEN_BASE_URL = f"http://{MICROTOKEN_HOST}:{MICROTOKEN_PORT}"
+
+# REST Framework settings - disable authentication for demo
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [],
+}
 
 LOGGING = {
     "version": 1,

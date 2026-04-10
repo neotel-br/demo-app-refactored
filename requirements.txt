@@ -10,3 +10,4 @@ urllib3==2.5.0
 django_rest_framework
 python-dotenv
 django-environ
+django-cors-headers==4.3.1
