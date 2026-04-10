@@ -295,3 +295,71 @@ def list_positions(request):
     
     serializer = PositionSerializer(positions, many=True)
     return Response(serializer.data)
+
+
+@api_view(["POST"])
+def login_api(request):
+    """
+    API endpoint for user login
+    Expected data: username, password
+    Returns: user data
+    """
+    try:
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        if not username or not password:
+            return Response(
+                {"error": "Username e password são obrigatórios"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is None:
+            return Response(
+                {"error": "Credenciais inválidas"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        login(request, user)
+        logger.info(f"operation: login status: success user: {user.username}")
+        
+        return Response({
+            "message": "Login realizado com sucesso",
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+            }
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        logger.error(f"operation: login status: fail error: {str(e)}")
+        return Response(
+            {"error": "Erro ao fazer login"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(["POST"])
+def logout_api(request):
+    """
+    API endpoint for user logout
+    """
+    try:
+        username = request.user.username if request.user else "unknown"
+        logout(request)
+        logger.info(f"operation: logout status: success user: {username}")
+        
+        return Response({
+            "message": "Logout realizado com sucesso"
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        logger.error(f"operation: logout status: fail error: {str(e)}")
+        return Response(
+            {"error": "Erro ao fazer logout"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
