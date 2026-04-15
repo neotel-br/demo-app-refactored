@@ -171,11 +171,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_URL = "/login/"
 
 MICROTOKEN_HOST = env_first("MICROTOKEN_HOST", "MICROTOKEN_IP", "IP", default="127.0.0.1")
 MICROTOKEN_PORT = env("MICROTOKEN_PORT", default="8001")
 MICROTOKEN_BASE_URL = f"http://{MICROTOKEN_HOST}:{MICROTOKEN_PORT}"
+
+# Session cookie settings
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_HTTPONLY = True
 
 # REST Framework settings - disable authentication for demo
 REST_FRAMEWORK = {

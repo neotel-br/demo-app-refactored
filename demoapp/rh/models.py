@@ -57,50 +57,55 @@ class Employee(models.Model):
     def save(self, *args, **kwargs):
         if not self.employee_id:
             while True:
-                id = random.randint(10001, 99999)
-                if not Employee.objects.filter(employee_id=id).exists():
-                    self.employee_id = id
+                new_id = random.randint(10001, 99999)
+                if not Employee.objects.filter(employee_id=new_id).exists():
+                    self.employee_id = new_id
                     break
-        if not self.is_tokenized:
-            dict_employee = self.__dict__
-            nao_token = [
-                "state",
-                "_state",
-                "name",
-                "startdate",
-                "birthdate",
-                "icon",
-                "tokenized",
-                "salary",
-                "id",
-            ]
-            for dict_key in dict_employee:
-                datatype = dict_key.split("_")[-1]
-                if datatype not in nao_token:
-                    try:
-                        response_data = call_microtoken(
-                            f"/tokenize/{datatype}",
-                            {datatype: dict_employee[dict_key]},
-                            operation="tokenize",
-                            field_name=dict_key,
-                        )
-                    except MicrotokenError as exc:
-                        raise ValidationError(str(exc)) from exc
 
+        if not self.is_tokenized:
+            nao_token = {
+                "state", "_state", "name", "startdate", "birthdate",
+                "icon", "tokenized", "salary", "id",
+            }
+
+            # Collect fields to tokenize without mutating self yet
+            fields_to_token = {
+                k: v for k, v in self.__dict__.items()
+                if k.split("_")[-1] not in nao_token
+            }
+
+            tokens = {}
+            try:
+                for field_key, field_value in fields_to_token.items():
+                    datatype = field_key.split("_")[-1]
+                    response_data = call_microtoken(
+                        f"/tokenize/{datatype}",
+                        {datatype: field_value},
+                        operation="tokenize",
+                        field_name=field_key,
+                    )
                     token = response_data.get("token")
                     if not token:
-                        message = f"Microtoken API returned no token for {dict_key}."
+                        message = f"Microtoken API returned no token for {field_key}."
                         logger.error(message)
-                        raise ValidationError(message)
-
-                    dict_employee[dict_key] = token
+                        raise MicrotokenError(message)
+                    tokens[field_key] = token
                     logger.info(
                         "operation: tokenize key type: %s status: %s",
-                        dict_key,
+                        field_key,
                         response_data.get("status", "success"),
                     )
 
-            logger.info("Tokenized employee data successfully.")
+                # Apply all tokens atomically only after full success
+                for field_key, token in tokens.items():
+                    setattr(self, field_key, token)
+                self.is_tokenized = True
+                logger.info("Tokenized employee data successfully.")
 
-        self.is_tokenized = True
+            except MicrotokenError as exc:
+                logger.warning(
+                    "Microtoken unavailable, saving employee without tokenization: %s", exc
+                )
+                self.is_tokenized = False
+
         super().save(*args, **kwargs)

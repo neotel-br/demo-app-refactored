@@ -1,11 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from django.contrib.auth.decorators import login_required
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication
 from rest_framework import status
 import logging
 from rest_framework.response import Response
@@ -267,10 +269,14 @@ def create_employee(request):
             status=status.HTTP_201_CREATED
         )
     
+    except ValidationError as e:
+        msg = e.messages[0] if e.messages else "Erro de validação"
+        logger.error(f"operation: create_employee status: fail validation_error: {msg}")
+        return Response({"error": msg}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     except Exception as e:
         logger.error(f"operation: create_employee status: fail error: {str(e)}")
         return Response(
-            {"error": f"Erro ao criar funcionário: {str(e)}"},
+            {"error": "Erro ao criar funcionário. Tente novamente."},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
@@ -314,15 +320,15 @@ def login_api(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        user = authenticate(request, username=username, password=password)
-        
+        user = authenticate(request._request, username=username, password=password)
+
         if user is None:
             return Response(
                 {"error": "Credenciais inválidas"},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-        
-        login(request, user)
+
+        login(request._request, user)
         logger.info(f"operation: login status: success user: {user.username}")
         
         return Response({
@@ -349,17 +355,37 @@ def logout_api(request):
     API endpoint for user logout
     """
     try:
-        username = request.user.username if request.user else "unknown"
-        logout(request)
+        username = request._request.user.username if request._request.user else "unknown"
+        logout(request._request)
         logger.info(f"operation: logout status: success user: {username}")
-        
+
         return Response({
             "message": "Logout realizado com sucesso"
         }, status=status.HTTP_200_OK)
-    
+
     except Exception as e:
         logger.error(f"operation: logout status: fail error: {str(e)}")
         return Response(
             {"error": "Erro ao fazer logout"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(["GET"])
+@authentication_classes([SessionAuthentication])
+@permission_classes([])
+def get_current_user(request):
+    """
+    Returns the authenticated user from the Django session.
+    Used by the frontend to verify authentication state.
+    """
+    if not request.user.is_authenticated:
+        return Response(
+            {"error": "Not authenticated"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+    return Response({
+        "id": request.user.id,
+        "username": request.user.username,
+        "email": request.user.email,
+    })
