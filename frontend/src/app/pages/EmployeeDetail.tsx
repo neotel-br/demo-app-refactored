@@ -1,253 +1,679 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { Users, LogOut, ChevronLeft, User, Mail, Phone, Calendar, Wallet, CreditCard, Building2 } from "lucide-react";
+import {
+  Users, LogOut, ChevronLeft, User, Mail,
+  CreditCard, Building2, CheckCircle2, AlertCircle,
+} from "lucide-react";
+import { apiClient } from "@/lib/api";
+import { toast } from "sonner";
 
-const employeesData = {
-  "10003": {
-    name: "Carlos Pereira",
-    role: "Analista de Financeiro",
-    id: "10003",
-    cpf: "555.668.777-88",
-    rg: "70.556.687-77",
-    birthDate: "03/03/1992",
-    admissionDate: "01/03/2023",
-    salary: "R$ 4.500,00",
-    department: "Financeiro",
-    email: "carlos.pereira@example.com",
-    phone: "(21) 98777-0000",
-    bankAgency: "3678",
-    bankAccount: "JM7654",
-  },
-  "10004": {
-    name: "Ana Oliveira",
-    role: "Gerente de Financeiro",
-    id: "10004",
-    cpf: "555.668.777-88",
-    rg: "70.556.687-77",
-    birthDate: "03/03/1992",
-    admissionDate: "01/03/2023",
-    salary: "R$ 4.500,00",
-    department: "Financeiro",
-    email: "ana.oliveira@example.com",
-    phone: "(21) 98777-0000",
-    bankAgency: "3678",
-    bankAccount: "JM7654",
-  },
-  "10001": {
-    name: "João Silva",
-    role: "Analista de Cybersegurança",
-    id: "10001",
-    cpf: "123.456.789-00",
-    rg: "12.345.678-9",
-    birthDate: "01/01/1990",
-    admissionDate: "01/01/2023",
-    salary: "R$ 5.000,00",
-    department: "TI",
-    email: "joao.silva@example.com",
-    phone: "(21) 98765-1000",
-    bankAgency: "1001",
-    bankAccount: "12345-6",
-  },
-};
+interface IPosition {
+  id: number;
+  position_name: string;
+  department: number;
+}
+
+interface IDepartment {
+  id: number;
+  department_name: string;
+  department_icon: string | null;
+}
+
+interface IEmployee {
+  id: number;
+  employee_id: string;
+  employee_name: string;
+  employee_titlejob: IPosition;
+  department: IDepartment;
+  employee_cpf: string;
+  employee_rg: string;
+  employee_birthdate: string;
+  employee_startdate: string;
+  employee_salary: string;
+  employee_email: string;
+  employee_phone: string;
+  employee_bank: string;
+  employee_agency: string;
+  employee_cc: string;
+  is_tokenized: boolean;
+}
+
+const AVATAR_PALETTES = [
+  { bg: "#DBEAFE", color: "#1D4ED8" },
+  { bg: "#D1FAE5", color: "#065F46" },
+  { bg: "#FEF3C7", color: "#92400E" },
+  { bg: "#EDE9FE", color: "#5B21B6" },
+  { bg: "#FCE7F3", color: "#9D174D" },
+  { bg: "#FFEDD5", color: "#9A3412" },
+  { bg: "#E0F2FE", color: "#0369A1" },
+  { bg: "#FEE2E2", color: "#991B1B" },
+];
+
+function getAvatarPalette(name: string) {
+  const idx = name.charCodeAt(0) % AVATAR_PALETTES.length;
+  return AVATAR_PALETTES[idx];
+}
+
+const styles = `
+  * { box-sizing: border-box; }
+
+  .hr-det-root {
+    min-height: 100vh;
+    display: flex;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #F8FAFC;
+  }
+
+  /* ── Sidebar ── */
+  .hr-det-sidebar {
+    width: 64px;
+    flex-shrink: 0;
+    background: #FFFFFF;
+    border-right: 1px solid #E5E7EB;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 0;
+  }
+
+  .hr-det-sidebar-logo {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 2rem;
+  }
+
+  .hr-det-sidebar-logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  .hr-det-sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hr-det-nav-item {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    background: #ECFDF5;
+    color: #059669;
+    position: relative;
+    transition: background 0.15s;
+  }
+
+  .hr-det-nav-item::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 20px;
+    background: #059669;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .hr-det-sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .hr-det-logout-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    color: #9CA3AF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .hr-det-logout-btn:hover {
+    background: #FEF2F2;
+    color: #EF4444;
+  }
+
+  /* ── Main ── */
+  .hr-det-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Topbar */
+  .hr-det-topbar {
+    height: 64px;
+    flex-shrink: 0;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    background: #FFFFFF;
+  }
+
+  .hr-det-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .hr-det-back-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    border: 1.5px solid #E5E7EB;
+    background: #F9FAFB;
+    color: #6B7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .hr-det-back-btn:hover {
+    background: #F3F4F6;
+    color: #111827;
+    border-color: #D1D5DB;
+  }
+
+  .hr-det-topbar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.025em;
+  }
+
+  .hr-det-topbar-sub {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    font-weight: 400;
+    margin-top: 1px;
+  }
+
+  /* Data protection badge */
+  .hr-det-token-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .hr-det-token-badge.protected {
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
+    color: #059669;
+  }
+
+  .hr-det-token-badge.unprotected {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    color: #D97706;
+  }
+
+  /* Content */
+  .hr-det-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+  }
+
+  .hr-det-content::-webkit-scrollbar { width: 4px; }
+  .hr-det-content::-webkit-scrollbar-track { background: transparent; }
+  .hr-det-content::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 2px; }
+
+  .hr-det-content-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* Hero card */
+  .hr-det-hero {
+    background: #FFFFFF;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 14px;
+    padding: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hr-det-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #059669 0%, #34D399 60%, transparent 100%);
+  }
+
+  .hr-det-hero-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    flex-shrink: 0;
+  }
+
+  .hr-det-hero-info {
+    flex: 1;
+  }
+
+  .hr-det-hero-name {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.25rem;
+  }
+
+  .hr-det-hero-role {
+    font-size: 0.875rem;
+    color: #6B7280;
+    font-weight: 400;
+    margin-bottom: 1rem;
+  }
+
+  .hr-det-hero-tags {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .hr-det-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 100px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    border: 1px solid #E5E7EB;
+    color: #6B7280;
+    background: #F9FAFB;
+  }
+
+  .hr-det-tag.id {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+  }
+
+  .hr-det-tag.dept {
+    color: #059669;
+    border-color: #A7F3D0;
+    background: #ECFDF5;
+  }
+
+  /* Info grid */
+  .hr-det-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .hr-det-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* Info card */
+  .hr-det-card {
+    background: #FFFFFF;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 1.375rem;
+    transition: box-shadow 0.2s;
+  }
+
+  .hr-det-card:hover {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+
+  .hr-det-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid #F3F4F6;
+  }
+
+  .hr-det-card-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: #ECFDF5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #059669;
+    flex-shrink: 0;
+  }
+
+  .hr-det-card-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #9CA3AF;
+  }
+
+  /* Fields */
+  .hr-det-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .hr-det-field label {
+    display: block;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9CA3AF;
+    margin-bottom: 0.375rem;
+  }
+
+  .hr-det-field-value {
+    background: #F9FAFB;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 0.5625rem 0.75rem;
+    color: #374151;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    word-break: break-all;
+    min-height: 38px;
+  }
+
+  .hr-det-field-value.salary {
+    color: #059669;
+    border-color: #A7F3D0;
+    background: #ECFDF5;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    letter-spacing: -0.01em;
+  }
+
+  /* Loading / error states */
+  .hr-det-state {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F8FAFC;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  .hr-det-spinner {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #E5E7EB;
+    border-top-color: #059669;
+    animation: hrDetSpin 0.7s linear infinite;
+  }
+
+  @keyframes hrDetSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  .hr-det-error-box {
+    text-align: center;
+  }
+
+  .hr-det-error-msg {
+    font-size: 0.875rem;
+    color: #EF4444;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
+  .hr-det-error-link {
+    font-size: 0.8125rem;
+    color: #059669;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    transition: color 0.15s;
+  }
+
+  .hr-det-error-link:hover { color: #047857; }
+
+  @media (max-width: 768px) {
+    .hr-det-grid { grid-template-columns: 1fr; }
+  }
+`;
+
+function Field({ label, value, salary }: { label: string; value: string; salary?: boolean }) {
+  return (
+    <div className="hr-det-field">
+      <label>{label}</label>
+      <div className={`hr-det-field-value ${salary ? "salary" : ""}`}>
+        {salary && value ? `R$ ${value}` : (value || "—")}
+      </div>
+    </div>
+  );
+}
 
 export default function EmployeeDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [employee, setEmployee] = useState<IEmployee | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const employee = employeesData[id as keyof typeof employeesData] || employeesData["10003"];
+  useEffect(() => {
+    if (!id) return;
+    apiClient
+      .getEmployee(parseInt(id))
+      .then((data) => setEmployee(data as IEmployee))
+      .catch((err) => {
+        const msg = err instanceof Error ? err.message : "Erro ao carregar colaborador";
+        setError(msg);
+        toast.error(msg);
+      })
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const handleLogout = async () => {
+    try { await apiClient.logout(); } finally { navigate("/login"); }
+  };
+
+  if (loading) {
+    return (
+      <>
+        <style>{styles}</style>
+        <div className="hr-det-state"><div className="hr-det-spinner" /></div>
+      </>
+    );
+  }
+
+  if (error || !employee) {
+    return (
+      <>
+        <style>{styles}</style>
+        <div className="hr-det-state">
+          <div className="hr-det-error-box">
+            <p className="hr-det-error-msg">{error ?? "Colaborador não encontrado"}</p>
+            <button className="hr-det-error-link" onClick={() => navigate("/employees")}>
+              ← Voltar para a lista
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const palette = getAvatarPalette(employee.employee_name);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className="w-24 bg-white border-r border-gray-200 flex flex-col items-center py-6 gap-4">
-        <div className="mb-4">
-          <img 
-            src={`/images/logo_da.svg?v=${Date.now()}`}
-            alt="Neotel" 
-            style={{ width: '72px', height: '72px' }}
-          />
-        </div>
+    <>
+      <style>{styles}</style>
 
-        <div className="flex-1 flex flex-col gap-3">
-          <button 
-            onClick={() => navigate("/employees")}
-            className="w-12 h-12 bg-[#1AC647] hover:bg-[#17b33d] rounded-xl flex items-center justify-center transition-all"
-            title="Funcionários"
-          >
-            <Users className="w-6 h-6 text-white" />
-          </button>
-        </div>
-
-        <button
-          onClick={() => navigate("/login")}
-          className="w-12 h-12 hover:bg-red-50 rounded-xl flex items-center justify-center transition-all"
-          title="Sair"
-        >
-          <LogOut className="w-6 h-6 text-gray-400 hover:text-red-500" />
-        </button>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/employees")}
-              className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-600" />
+      <div className="hr-det-root">
+        {/* ── Sidebar ── */}
+        <aside className="hr-det-sidebar">
+          <div className="hr-det-sidebar-logo">
+            <img src="/images/logo_da.svg" alt="DemoApp" />
+          </div>
+          <nav className="hr-det-sidebar-nav">
+            <button className="hr-det-nav-item" title="Colaboradores" onClick={() => navigate("/employees")}>
+              <Users size={17} />
             </button>
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900">Perfil do Funcionário</h1>
-              <p className="text-sm text-gray-500">Visualização detalhada de informações</p>
+          </nav>
+          <div className="hr-det-sidebar-bottom">
+            <button className="hr-det-logout-btn" onClick={handleLogout} title="Sair">
+              <LogOut size={15} />
+            </button>
+          </div>
+        </aside>
+
+        {/* ── Main ── */}
+        <div className="hr-det-main">
+          {/* Topbar */}
+          <div className="hr-det-topbar">
+            <div className="hr-det-topbar-left">
+              <button className="hr-det-back-btn" onClick={() => navigate("/employees")}>
+                <ChevronLeft size={15} />
+              </button>
+              <div>
+                <div className="hr-det-topbar-title">{employee.employee_name}</div>
+                <div className="hr-det-topbar-sub">{employee.employee_titlejob?.position_name ?? "Perfil do Colaborador"}</div>
+              </div>
+            </div>
+
+            {employee.is_tokenized ? (
+              <div className="hr-det-token-badge protected">
+                <CheckCircle2 size={12} />
+                Dados protegidos
+              </div>
+            ) : (
+              <div className="hr-det-token-badge unprotected">
+                <AlertCircle size={12} />
+                Proteção pendente
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="hr-det-content">
+            <div className="hr-det-content-inner">
+
+              {/* Hero */}
+              <div className="hr-det-hero">
+                <div
+                  className="hr-det-hero-avatar"
+                  style={{ background: palette.bg, color: palette.color }}
+                >
+                  {employee.employee_name.charAt(0).toUpperCase()}
+                </div>
+                <div className="hr-det-hero-info">
+                  <div className="hr-det-hero-name">{employee.employee_name}</div>
+                  <div className="hr-det-hero-role">{employee.employee_titlejob?.position_name ?? "—"}</div>
+                  <div className="hr-det-hero-tags">
+                    <span className="hr-det-tag id">ID · {employee.employee_id}</span>
+                    <span className="hr-det-tag dept">
+                      <Building2 size={10} />
+                      {employee.department?.department_name ?? "—"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Info grid */}
+              <div className="hr-det-grid">
+                {/* Left: Dados Pessoais */}
+                <div className="hr-det-col">
+                  <div className="hr-det-card">
+                    <div className="hr-det-card-header">
+                      <div className="hr-det-card-icon"><User size={13} /></div>
+                      <span className="hr-det-card-title">Dados Pessoais</span>
+                    </div>
+                    <div className="hr-det-fields">
+                      <Field label="CPF" value={employee.employee_cpf} />
+                      <Field label="RG" value={employee.employee_rg} />
+                      <Field label="Data de Nascimento" value={employee.employee_birthdate} />
+                      <Field label="Data de Admissão" value={employee.employee_startdate} />
+                      <Field label="Salário" value={employee.employee_salary} salary />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Contato + Bancário */}
+                <div className="hr-det-col">
+                  <div className="hr-det-card">
+                    <div className="hr-det-card-header">
+                      <div className="hr-det-card-icon"><Mail size={13} /></div>
+                      <span className="hr-det-card-title">Contato</span>
+                    </div>
+                    <div className="hr-det-fields">
+                      <Field label="E-mail" value={employee.employee_email} />
+                      <Field label="Telefone" value={employee.employee_phone} />
+                    </div>
+                  </div>
+
+                  <div className="hr-det-card">
+                    <div className="hr-det-card-header">
+                      <div className="hr-det-card-icon"><CreditCard size={13} /></div>
+                      <span className="hr-det-card-title">Dados Bancários</span>
+                    </div>
+                    <div className="hr-det-fields">
+                      <Field label="Banco" value={employee.employee_bank} />
+                      <Field label="Agência" value={employee.employee_agency} />
+                      <Field label="Conta Corrente" value={employee.employee_cc} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
-        </header>
-
-        {/* Content */}
-        <main className="flex-1 p-8 overflow-auto">
-          <div className="max-w-6xl mx-auto space-y-6">
-            {/* Employee Header */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 bg-[#1AC647] rounded-xl flex items-center justify-center">
-                  <User className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-semibold text-gray-900">{employee.name}</h2>
-                  <p className="text-gray-600">{employee.role}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg">
-                  ID: {employee.id}
-                </span>
-                <span className="px-3 py-1.5 bg-[#1AC647]/10 text-[#1AC647] rounded-lg text-sm font-medium flex items-center gap-2">
-                  <Building2 className="w-4 h-4" />
-                  {employee.department}
-                </span>
-              </div>
-            </div>
-
-            {/* Info Grid */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* Personal Information */}
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200">
-                  <User className="w-5 h-5 text-[#1AC647]" />
-                  <h3 className="text-lg font-semibold text-gray-900">Informações Pessoais</h3>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase mb-1.5 block">
-                      CPF
-                    </label>
-                    <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                      {employee.cpf}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase mb-1.5 block">
-                      RG
-                    </label>
-                    <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                      {employee.rg}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase mb-1.5 block">
-                      Data de Nascimento
-                    </label>
-                    <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                      {employee.birthDate}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase mb-1.5 block">
-                      Data de Admissão
-                    </label>
-                    <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                      {employee.admissionDate}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase mb-1.5 block">
-                      Salário
-                    </label>
-                    <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 font-semibold">
-                      {employee.salary}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact & Banking */}
-              <div className="space-y-6">
-                {/* Contact Info */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
-                  <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200">
-                    <Mail className="w-5 h-5 text-[#1AC647]" />
-                    <h3 className="text-lg font-semibold text-gray-900">Informações de Contato</h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase mb-1.5 block">
-                        E-mail
-                      </label>
-                      <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 break-all">
-                        {employee.email}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase mb-1.5 block">
-                        Telefone
-                      </label>
-                      <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                        {employee.phone}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Banking Information */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
-                  <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200">
-                    <CreditCard className="w-5 h-5 text-[#1AC647]" />
-                    <h3 className="text-lg font-semibold text-gray-900">Dados Bancários</h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase mb-1.5 block">
-                        Agência
-                      </label>
-                      <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                        {employee.bankAgency}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase mb-1.5 block">
-                        Conta Corrente
-                      </label>
-                      <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                        {employee.bankAccount}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

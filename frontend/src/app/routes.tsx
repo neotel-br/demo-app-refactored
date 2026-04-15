@@ -4,30 +4,31 @@ import Register from "./pages/Register";
 import EmployeeListIntegrated from "./pages/EmployeeListIntegrated";
 import EmployeeDetail from "./pages/EmployeeDetail";
 import AddEmployee from "./pages/AddEmployee";
+import { ProtectedRoute, GuestRoute } from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    Component: EmployeeListIntegrated,
+    element: <ProtectedRoute><EmployeeListIntegrated /></ProtectedRoute>,
   },
   {
     path: "/login",
-    Component: Login,
+    element: <GuestRoute><Login /></GuestRoute>,
   },
   {
     path: "/register",
-    Component: Register,
+    element: <GuestRoute><Register /></GuestRoute>,
   },
   {
     path: "/employees",
-    Component: EmployeeListIntegrated,
+    element: <ProtectedRoute><EmployeeListIntegrated /></ProtectedRoute>,
   },
   {
     path: "/employees/add",
-    Component: AddEmployee,
+    element: <ProtectedRoute><AddEmployee /></ProtectedRoute>,
   },
   {
     path: "/employees/:id",
-    Component: EmployeeDetail,
+    element: <ProtectedRoute><EmployeeDetail /></ProtectedRoute>,
   },
 ]);
