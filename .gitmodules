@@ -1,0 +1,4 @@
+[submodule "microtoken"]
+	path = microtoken
+	url = https://github.com/neotel-br/microtoken.git
+	branch = microtoken-demoapp
