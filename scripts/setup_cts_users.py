@@ -107,10 +107,15 @@ def get_token(session: requests.Session) -> str:
     return token
 
 
+def get_results(data: list | dict) -> list:
+    """Handle both plain list and paginated {results: [...]} responses."""
+    return data if isinstance(data, list) else data["results"]
+
+
 def find_mask(session: requests.Session, name: str) -> dict | None:
     r = session.get(f"{CTS_BASE}/masks/", params={"search": name})
     r.raise_for_status()
-    for m in r.json()["results"]:
+    for m in get_results(r.json()):
         if m["name"] == name:
             return m
     return None
@@ -139,7 +144,7 @@ def create_mask(session: requests.Session, cfg: dict) -> dict:
 def find_user(session: requests.Session, username: str) -> dict | None:
     r = session.get(f"{CTS_BASE}/users/", params={"search": username})
     r.raise_for_status()
-    for u in r.json()["results"]:
+    for u in get_results(r.json()):
         if u["username"] == username:
             return u
     return None
@@ -189,7 +194,7 @@ def assign_detokenize(session: requests.Session, username: str) -> None:
         params={"user__username": username},
     )
     r.raise_for_status()
-    for p in r.json()["results"]:
+    for p in get_results(r.json()):
         if p["user"] == username and p.get("canGet"):
             print(f"  detokenize permission already exists")
             return
