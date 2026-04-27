@@ -2,6 +2,7 @@
 set -e
 
 echo "==> Starting containers..."
+docker compose down -v 2>/dev/null || true
 docker compose up -d --build
 
 echo ""
