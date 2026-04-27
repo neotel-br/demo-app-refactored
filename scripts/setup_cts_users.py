@@ -198,14 +198,23 @@ def get_first_key(session: requests.Session) -> str:
     return keys[0]["name"]
 
 
-def get_first_asymkey(session: requests.Session) -> str | None:
-    r = session.get(f"{CTS_BASE}/asymkeys/")
+def get_permission_template(session: requests.Session) -> dict:
+    """Get key/asymkey values from an existing token permission to use as template."""
+    r = session.get(f"{CTS_BASE}/permissions/token/users/")
     r.raise_for_status()
-    keys = get_results(r.json())
-    return keys[0]["name"] if keys else None
+    perms = get_results(r.json())
+    for p in perms:
+        if p.get("key") and p.get("asymkey"):
+            return {"key": p["key"], "asymkey": p["asymkey"]}
+    # fallback: try asymkeys endpoint
+    r2 = session.get(f"{CTS_BASE}/asymkeys/")
+    r2.raise_for_status()
+    asymkeys = get_results(r2.json())
+    asymkey = asymkeys[0]["name"] if asymkeys else ""
+    return {"key": get_first_key(session), "asymkey": asymkey}
 
 
-def assign_detokenize(session: requests.Session, username: str, key: str, asymkey: str | None) -> None:
+def assign_detokenize(session: requests.Session, username: str, key: str, asymkey: str) -> None:
     r = session.get(
         f"{CTS_BASE}/permissions/token/users/",
         params={"user__username": username},
@@ -215,10 +224,10 @@ def assign_detokenize(session: requests.Session, username: str, key: str, asymke
         if p["user"] == username and p.get("canGet"):
             print(f"  detokenize permission already exists")
             return
-    payload = {"user": username, "key": key, "canGet": True, "canPost": False}
-    if asymkey:
-        payload["asymkey"] = asymkey
-    r = session.post(f"{CTS_BASE}/permissions/token/users/", json=payload)
+    r = session.post(
+        f"{CTS_BASE}/permissions/token/users/",
+        json={"user": username, "key": key, "asymkey": asymkey, "canGet": True, "canPost": False},
+    )
     r.raise_for_status()
     print(f"  assigned detokenize permission (key={key})")
 
@@ -236,8 +245,9 @@ def main() -> None:
     session.headers["Authorization"] = f"Bearer {token}"
     print("OK\n")
 
-    key = get_first_key(session)
-    asymkey = get_first_asymkey(session)
+    tmpl = get_permission_template(session)
+    key = tmpl["key"]
+    asymkey = tmpl["asymkey"]
 
     failed = []
     for cfg in DEMO_USERS:
