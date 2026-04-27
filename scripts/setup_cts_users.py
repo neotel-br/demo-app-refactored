@@ -198,7 +198,14 @@ def get_first_key(session: requests.Session) -> str:
     return keys[0]["name"]
 
 
-def assign_detokenize(session: requests.Session, username: str, key: str) -> None:
+def get_first_asymkey(session: requests.Session) -> str | None:
+    r = session.get(f"{CTS_BASE}/asymkeys/")
+    r.raise_for_status()
+    keys = get_results(r.json())
+    return keys[0]["name"] if keys else None
+
+
+def assign_detokenize(session: requests.Session, username: str, key: str, asymkey: str | None) -> None:
     r = session.get(
         f"{CTS_BASE}/permissions/token/users/",
         params={"user__username": username},
@@ -208,10 +215,10 @@ def assign_detokenize(session: requests.Session, username: str, key: str) -> Non
         if p["user"] == username and p.get("canGet"):
             print(f"  detokenize permission already exists")
             return
-    r = session.post(
-        f"{CTS_BASE}/permissions/token/users/",
-        json={"user": username, "key": key, "canGet": True, "canPost": False},
-    )
+    payload = {"user": username, "key": key, "canGet": True, "canPost": False}
+    if asymkey:
+        payload["asymkey"] = asymkey
+    r = session.post(f"{CTS_BASE}/permissions/token/users/", json=payload)
     r.raise_for_status()
     print(f"  assigned detokenize permission (key={key})")
 
@@ -230,6 +237,7 @@ def main() -> None:
     print("OK\n")
 
     key = get_first_key(session)
+    asymkey = get_first_asymkey(session)
 
     failed = []
     for cfg in DEMO_USERS:
@@ -238,7 +246,7 @@ def main() -> None:
             mask = create_mask(session, cfg["mask"])
             user = create_user(session, cfg)
             assign_mask(session, user, mask["name"])
-            assign_detokenize(session, cfg["username"], key)
+            assign_detokenize(session, cfg["username"], key, asymkey)
         except requests.HTTPError as e:
             print(f"  ERROR: {e.response.status_code} {e.response.text}")
             failed.append(cfg["username"])
