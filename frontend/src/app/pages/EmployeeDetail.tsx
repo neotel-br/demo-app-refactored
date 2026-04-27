@@ -2,10 +2,21 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   Users, LogOut, ChevronLeft, User, Mail,
-  CreditCard, Building2, CheckCircle2, AlertCircle,
+  CreditCard, Building2, CheckCircle2, AlertCircle, Trash2,
 } from "lucide-react";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/app/components/ui/alert-dialog";
 
 interface IPosition {
   id: number;
@@ -436,6 +447,32 @@ const styles = `
     letter-spacing: -0.01em;
   }
 
+  /* Delete button */
+  .hr-det-delete-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1.5px solid #FECACA;
+    background: #FEF2F2;
+    color: #EF4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+  }
+
+  .hr-det-delete-btn:hover:not(:disabled) {
+    background: #FEE2E2;
+    border-color: #FCA5A5;
+  }
+
+  .hr-det-delete-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   /* Loading / error states */
   .hr-det-state {
     min-height: 100vh;
@@ -505,11 +542,13 @@ export default function EmployeeDetail() {
   const [employee, setEmployee] = useState<IEmployee | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     apiClient
       .getEmployee(parseInt(id))
+      .then((data) => apiClient.detokenize(data))
       .then((data) => setEmployee(data as IEmployee))
       .catch((err) => {
         const msg = err instanceof Error ? err.message : "Erro ao carregar colaborador";
@@ -521,6 +560,20 @@ export default function EmployeeDetail() {
 
   const handleLogout = async () => {
     try { await apiClient.logout(); } finally { navigate("/login"); }
+  };
+
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      setDeleting(true);
+      await apiClient.deleteEmployee(parseInt(id));
+      toast.success("Colaborador removido com sucesso.");
+      navigate("/employees");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao remover colaborador";
+      toast.error(msg);
+      setDeleting(false);
+    }
   };
 
   if (loading) {
@@ -586,17 +639,44 @@ export default function EmployeeDetail() {
               </div>
             </div>
 
-            {employee.is_tokenized ? (
-              <div className="hr-det-token-badge protected">
-                <CheckCircle2 size={12} />
-                Dados protegidos
-              </div>
-            ) : (
-              <div className="hr-det-token-badge unprotected">
-                <AlertCircle size={12} />
-                Proteção pendente
-              </div>
-            )}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              {employee.is_tokenized ? (
+                <div className="hr-det-token-badge protected">
+                  <CheckCircle2 size={12} />
+                  Dados protegidos
+                </div>
+              ) : (
+                <div className="hr-det-token-badge unprotected">
+                  <AlertCircle size={12} />
+                  Proteção pendente
+                </div>
+              )}
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button className="hr-det-delete-btn" disabled={deleting} title="Remover colaborador">
+                    <Trash2 size={14} />
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Remover colaborador?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta ação não pode ser desfeita. O colaborador <strong>{employee.employee_name}</strong> será removido permanentemente.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      style={{ background: "#EF4444" }}
+                    >
+                      Remover
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
 
           {/* Content */}

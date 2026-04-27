@@ -1,34 +1,24 @@
 import { createBrowserRouter } from "react-router";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import EmployeeListIntegrated from "./pages/EmployeeListIntegrated";
-import EmployeeDetail from "./pages/EmployeeDetail";
-import AddEmployee from "./pages/AddEmployee";
-import { ProtectedRoute, GuestRoute } from "./components/ProtectedRoute";
+import PortalTransparencia from "./pages/PortalTransparencia";
+import PortalAdmin from "./pages/PortalAdmin";
+import AppFlowDiagram from "./pages/AppFlowDiagram";
+import ArquiteturaFlow from "../components/ArquiteturaFlow";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <ProtectedRoute><EmployeeListIntegrated /></ProtectedRoute>,
+    element: <PortalTransparencia />,
   },
   {
-    path: "/login",
-    element: <GuestRoute><Login /></GuestRoute>,
+    path: "/gerenciar",
+    element: <PortalAdmin />,
   },
   {
-    path: "/register",
-    element: <GuestRoute><Register /></GuestRoute>,
+    path: "/admin/flow",
+    element: <AppFlowDiagram />,
   },
   {
-    path: "/employees",
-    element: <ProtectedRoute><EmployeeListIntegrated /></ProtectedRoute>,
-  },
-  {
-    path: "/employees/add",
-    element: <ProtectedRoute><AddEmployee /></ProtectedRoute>,
-  },
-  {
-    path: "/employees/:id",
-    element: <ProtectedRoute><EmployeeDetail /></ProtectedRoute>,
+    path: "/arquitetura",
+    element: <ArquiteturaFlow />,
   },
 ]);

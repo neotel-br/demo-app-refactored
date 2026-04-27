@@ -596,14 +596,7 @@ export default function Login() {
             </div>
           </form>
 
-          <div className="hr-form-footer hr-anim-r5">
-            <span className="hr-footer-text">Ainda sem conta?</span>
-            <button onClick={() => navigate("/register")} className="hr-footer-link">
-              Criar conta
-            </button>
-          </div>
-
-          <p className="hr-copyright hr-anim-r6">
+          <p className="hr-copyright hr-anim-r5">
             Powered by Neotel © 2026
           </p>
         </div>

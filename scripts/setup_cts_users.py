@@ -188,33 +188,23 @@ def assign_mask(session: requests.Session, user: dict, mask_name: str) -> None:
         )
 
 
-def get_first_key(session: requests.Session) -> str:
-    r = session.get(f"{CTS_BASE}/keys/")
-    r.raise_for_status()
-    keys = get_results(r.json())
-    if not keys:
-        print("ERROR: no symmetric keys found in CT-VL")
-        sys.exit(1)
-    return keys[0]["name"]
-
-
 def get_permission_template(session: requests.Session) -> dict:
-    """Get key/asymkey values from an existing token permission to use as template."""
+    """Copy all fields from an existing token permission to use as template for new ones."""
     r = session.get(f"{CTS_BASE}/permissions/token/users/")
     r.raise_for_status()
     perms = get_results(r.json())
     for p in perms:
-        if p.get("key") and p.get("asymkey"):
-            return {"key": p["key"], "asymkey": p["asymkey"]}
-    # fallback: try asymkeys endpoint
-    r2 = session.get(f"{CTS_BASE}/asymkeys/")
-    r2.raise_for_status()
-    asymkeys = get_results(r2.json())
-    asymkey = asymkeys[0]["name"] if asymkeys else ""
-    return {"key": get_first_key(session), "asymkey": asymkey}
+        if p.get("key"):
+            return {
+                "key": p.get("key", ""),
+                "asymkey": p.get("asymkey", ""),
+                "opaqueobj": p.get("opaqueobj", ""),
+            }
+    print("ERROR: no existing token permissions found to use as template — create CPF permission manually first")
+    sys.exit(1)
 
 
-def assign_detokenize(session: requests.Session, username: str, key: str, asymkey: str) -> None:
+def assign_detokenize(session: requests.Session, username: str, tmpl: dict) -> None:
     r = session.get(
         f"{CTS_BASE}/permissions/token/users/",
         params={"user__username": username},
@@ -226,10 +216,10 @@ def assign_detokenize(session: requests.Session, username: str, key: str, asymke
             return
     r = session.post(
         f"{CTS_BASE}/permissions/token/users/",
-        json={"user": username, "key": key, "asymkey": asymkey, "canGet": True, "canPost": False},
+        json={**tmpl, "user": username, "canGet": True, "canPost": False},
     )
     r.raise_for_status()
-    print(f"  assigned detokenize permission (key={key})")
+    print(f"  assigned detokenize permission")
 
 
 # ---------------------------------------------------------------------------
@@ -246,8 +236,6 @@ def main() -> None:
     print("OK\n")
 
     tmpl = get_permission_template(session)
-    key = tmpl["key"]
-    asymkey = tmpl["asymkey"]
 
     failed = []
     for cfg in DEMO_USERS:
@@ -256,7 +244,7 @@ def main() -> None:
             mask = create_mask(session, cfg["mask"])
             user = create_user(session, cfg)
             assign_mask(session, user, mask["name"])
-            assign_detokenize(session, cfg["username"], key, asymkey)
+            assign_detokenize(session, cfg["username"], tmpl)
         except requests.HTTPError as e:
             print(f"  ERROR: {e.response.status_code} {e.response.text}")
             failed.append(cfg["username"])

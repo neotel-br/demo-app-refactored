@@ -1,8 +1,16 @@
 import { useNavigate } from "react-router";
-import { Users, LogOut, Search, Building2, ChevronRight, Plus } from "lucide-react";
+import { Users, Search, Building2, ChevronRight, Plus, ChevronDown, LogOut, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/app/components/ui/dropdown-menu";
 
 interface IPosition {
   id: number;
@@ -321,6 +329,48 @@ const styles = `
     color: #9CA3AF;
     font-weight: 400;
     margin-top: 1px;
+  }
+
+  .hr-emp-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+    background: #F9FAFB;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 9px;
+    cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #374151;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .hr-emp-user-btn:hover {
+    border-color: #D1D5DB;
+    background: #F3F4F6;
+  }
+
+  .hr-emp-user-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: #D1FAE5;
+    color: #065F46;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .hr-emp-user-name {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .hr-emp-add-btn {
@@ -741,7 +791,6 @@ export default function EmployeeList() {
   const [employees, setEmployees] = useState<IEmployee[]>([]);
   const [loading, setLoading] = useState(true);
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
-  const [showProfile, setShowProfile] = useState(false);
   const [currentUser, setCurrentUser] = useState<ICurrentUser | null>(null);
 
   useEffect(() => {
@@ -801,43 +850,7 @@ export default function EmployeeList() {
             </button>
           </nav>
 
-          <div className="hr-emp-sidebar-bottom">
-            <button
-              className="hr-emp-sidebar-avatar"
-              title="Meu perfil"
-              onClick={() => setShowProfile(p => !p)}
-            >
-              {userInitial}
-            </button>
-            <button className="hr-emp-logout-btn" onClick={handleLogout} title="Sair">
-              <LogOut size={15} />
-            </button>
-          </div>
         </aside>
-
-        {/* Profile panel */}
-        {showProfile && (
-          <>
-            <div className="hr-emp-profile-overlay" onClick={() => setShowProfile(false)} />
-            <div className="hr-emp-profile-panel">
-              <div className="hr-emp-profile-header">
-                <div className="hr-emp-profile-avatar-large">{userInitial}</div>
-                <div className="hr-emp-profile-name">{currentUser?.username ?? "—"}</div>
-                <div className="hr-emp-profile-email">{currentUser?.email ?? "—"}</div>
-              </div>
-              <div className="hr-emp-profile-divider" />
-              <div className="hr-emp-profile-actions">
-                <button
-                  className="hr-emp-profile-action-btn danger"
-                  onClick={() => { setShowProfile(false); handleLogout(); }}
-                >
-                  <LogOut size={13} />
-                  Sair da conta
-                </button>
-              </div>
-            </div>
-          </>
-        )}
 
         {/* ── Main ── */}
         <div className="hr-emp-main">
@@ -849,10 +862,36 @@ export default function EmployeeList() {
                 {loading ? "Carregando..." : `${employees.length} colaborador${employees.length !== 1 ? "es" : ""} cadastrado${employees.length !== 1 ? "s" : ""}`}
               </div>
             </div>
-            <button className="hr-emp-add-btn" onClick={() => navigate("/employees/add")}>
-              <Plus size={14} />
-              Novo Colaborador
-            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <button className="hr-emp-add-btn" onClick={() => navigate("/employees/add")}>
+                <Plus size={14} />
+                Novo Colaborador
+              </button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="hr-emp-user-btn">
+                    <span className="hr-emp-user-avatar">{userInitial}</span>
+                    <span className="hr-emp-user-name">{currentUser?.username ?? "—"}</span>
+                    <ChevronDown size={13} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" style={{ minWidth: "200px" }}>
+                  <DropdownMenuLabel style={{ fontWeight: 500, color: "#9CA3AF", fontSize: "0.75rem" }}>
+                    {currentUser?.email ?? ""}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <RefreshCw size={13} style={{ marginRight: "0.5rem" }} />
+                    Trocar de conta
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} style={{ color: "#EF4444" }}>
+                    <LogOut size={13} style={{ marginRight: "0.5rem" }} />
+                    Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Content */}
