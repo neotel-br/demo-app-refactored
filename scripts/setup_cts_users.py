@@ -188,7 +188,17 @@ def assign_mask(session: requests.Session, user: dict, mask_name: str) -> None:
         )
 
 
-def assign_detokenize(session: requests.Session, username: str) -> None:
+def get_first_key(session: requests.Session) -> str:
+    r = session.get(f"{CTS_BASE}/keys/")
+    r.raise_for_status()
+    keys = get_results(r.json())
+    if not keys:
+        print("ERROR: no symmetric keys found in CT-VL")
+        sys.exit(1)
+    return keys[0]["name"]
+
+
+def assign_detokenize(session: requests.Session, username: str, key: str) -> None:
     r = session.get(
         f"{CTS_BASE}/permissions/token/users/",
         params={"user__username": username},
@@ -200,10 +210,10 @@ def assign_detokenize(session: requests.Session, username: str) -> None:
             return
     r = session.post(
         f"{CTS_BASE}/permissions/token/users/",
-        json={"user": username, "canGet": True, "canPost": False},
+        json={"user": username, "key": key, "canGet": True, "canPost": False},
     )
     r.raise_for_status()
-    print(f"  assigned detokenize permission")
+    print(f"  assigned detokenize permission (key={key})")
 
 
 # ---------------------------------------------------------------------------
@@ -219,6 +229,8 @@ def main() -> None:
     session.headers["Authorization"] = f"Bearer {token}"
     print("OK\n")
 
+    key = get_first_key(session)
+
     failed = []
     for cfg in DEMO_USERS:
         print(f"[{cfg['username']}]")
@@ -226,7 +238,7 @@ def main() -> None:
             mask = create_mask(session, cfg["mask"])
             user = create_user(session, cfg)
             assign_mask(session, user, mask["name"])
-            assign_detokenize(session, cfg["username"])
+            assign_detokenize(session, cfg["username"], key)
         except requests.HTTPError as e:
             print(f"  ERROR: {e.response.status_code} {e.response.text}")
             failed.append(cfg["username"])
