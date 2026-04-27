@@ -1240,9 +1240,13 @@ function AuditTab({ auditLog }) {
    ROOT
 ───────────────────────────────────────────── */
 export default function PortalTransparencia() {
-  const [currentUser,   setCurrentUser]   = useState(null);
+  const [currentUser,   setCurrentUser]   = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem("pt_user")) || null; } catch { return null; }
+  });
   const [activeTab,     setActiveTab]     = useState("home");
-  const [accessLevel,   setAccessLevel]   = useState("citizen");
+  const [accessLevel,   setAccessLevel]   = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem("pt_user"))?.role || "citizen"; } catch { return "citizen"; }
+  });
   const [detailContext, setDetailContext] = useState(null);
   const [revealedValues, setRevealedValues] = useState({});
   const [showModal,     setShowModal]     = useState(false);
@@ -1253,6 +1257,7 @@ export default function PortalTransparencia() {
   const [dataLoading,   setDataLoading]   = useState(true);
 
   const handleLogout = () => {
+    sessionStorage.removeItem("pt_user");
     setCurrentUser(null);
     setAccessLevel("citizen");
     setRevealedValues({});
@@ -1369,7 +1374,7 @@ export default function PortalTransparencia() {
   ];
 
   if (!currentUser) {
-    return <LoginPortal onLogin={(user) => { setCurrentUser(user); setAccessLevel(user.role); }} />;
+    return <LoginPortal onLogin={(user) => { sessionStorage.setItem("pt_user", JSON.stringify(user)); setCurrentUser(user); setAccessLevel(user.role); }} />;
   }
 
   return (

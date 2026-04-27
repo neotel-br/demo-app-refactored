@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+const djangoUrl = process.env.DJANGO_URL || 'http://localhost:8001';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -20,8 +21,12 @@ export default defineConfig({
         target: backendUrl,
         changeOrigin: true,
       },
+      '/static': {
+        target: djangoUrl,
+        changeOrigin: true,
+      },
       '/admin': {
-        target: backendUrl,
+        target: djangoUrl,
         changeOrigin: true,
       },
     },

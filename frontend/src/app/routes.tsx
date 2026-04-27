@@ -14,10 +14,6 @@ export const router = createBrowserRouter([
     element: <PortalAdmin />,
   },
   {
-    path: "/admin/flow",
-    element: <AppFlowDiagram />,
-  },
-  {
     path: "/arquitetura",
     element: <ArquiteturaFlow />,
   },

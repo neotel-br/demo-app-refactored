@@ -791,11 +791,11 @@ export default function PortalAdmin() {
               Contratos Públicos
             </button>
             <a
-              href="/admin/flow"
+              href="/arquitetura"
               className="pa-tab"
               style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", textDecoration: "none" }}
             >
-              🔐 Arquitetura MicroToken
+              Arquitetura MicroToken
             </a>
           </div>
 
