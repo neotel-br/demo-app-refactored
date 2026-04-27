@@ -189,19 +189,31 @@ def assign_mask(session: requests.Session, user: dict, mask_name: str) -> None:
 
 
 def get_permission_template(session: requests.Session) -> dict:
-    """Copy all fields from an existing token permission to use as template for new ones."""
+    """Build permission template: copy from existing permission or discover from CT-VL resources."""
     r = session.get(f"{CTS_BASE}/permissions/token/users/")
     r.raise_for_status()
-    perms = get_results(r.json())
-    for p in perms:
+    for p in get_results(r.json()):
         if p.get("key"):
             return {
                 "key": p.get("key", ""),
                 "asymkey": p.get("asymkey", ""),
                 "opaqueobj": p.get("opaqueobj", ""),
             }
-    print("ERROR: no existing token permissions found to use as template — create CPF permission manually first")
-    sys.exit(1)
+
+    # Fresh CTS — discover resources directly
+    keys = get_results(session.get(f"{CTS_BASE}/keys/").json())
+    asymkeys = get_results(session.get(f"{CTS_BASE}/asymkeys/").json())
+    opaqueobjs = get_results(session.get(f"{CTS_BASE}/opaqueobjs/").json())
+
+    if not keys:
+        print("ERROR: no symmetric keys found in CT-VL — create one first")
+        sys.exit(1)
+
+    return {
+        "key": keys[0]["name"],
+        "asymkey": asymkeys[0]["name"] if asymkeys else "",
+        "opaqueobj": opaqueobjs[0]["name"] if opaqueobjs else "",
+    }
 
 
 def assign_detokenize(session: requests.Session, username: str, tmpl: dict) -> None:
