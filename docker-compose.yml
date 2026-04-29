@@ -1,4 +1,15 @@
 services:
+  microtoken:
+    container_name: microtoken
+    build:
+      context: ./microtoken/fastapi
+      dockerfile: Dockerfile
+    ports:
+      - "3700:3700"
+    env_file:
+      - ./microtoken/.env
+    restart: unless-stopped
+
   demoapp:
     container_name: demoapp
     build:
@@ -12,6 +23,8 @@ services:
       - demoapp_data:/demoapp/data
       - demoapp_static:/demoapp/static
     restart: always
+    depends_on:
+      - microtoken
     networks:
       - app-network
 
