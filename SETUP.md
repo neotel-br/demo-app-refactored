@@ -121,14 +121,24 @@ Login padrão: usuário e senha definidos em `.env`.
 
 ## Funcionalidades da demo
 
-### RH Interno (`/rh`)
-Cadastro de funcionários com campos sensíveis tokenizados no CT-VL:
-- CPF, RG, e-mail, telefone, banco, agência, conta-corrente
-
 ### Portal de Transparência (`/portal-transparencia`)
 Visualização pública de servidores e contratos com detokenização por perfil de acesso:
 - `ServidorPublico`: CPF, benefícios, endereço, data de nascimento
 - `ContratoPublico`: CNPJ, responsável, dados bancários
+
+---
+
+## Credenciais padrão do CTS
+
+O script `setup_cts_users.py` autentica no CT-VL com as credenciais de administrador padrão:
+
+| Campo | Valor |
+|-------|-------|
+| Usuário | `ctsroot` |
+| Senha | `N3oS3nh@2021` |
+
+> **Atenção:** Estas são as credenciais padrão do ambiente de demonstração.
+> Em produção, altere a senha do `ctsroot` no painel do CT-VL e atualize os scripts.
 
 ---
 
