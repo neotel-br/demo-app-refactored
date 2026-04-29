@@ -104,6 +104,19 @@ O script executa automaticamente:
 > **Atenção:** Se aparecer `WARNING: mask assignment via API failed`, acesse o painel do CT-VL,
 > abra o usuário indicado e atribua a máscara manualmente.
 
+
+## Credenciais padrão do CTS
+
+O script `setup_cts_users.py` autentica no CT-VL com as credenciais de administrador padrão:
+
+| Campo | Valor |
+|-------|-------|
+| Usuário | `ctsroot` |
+| Senha | `N3oS3nh@2021` |
+
+> **Atenção:** Estas são as credenciais padrão do ambiente de demonstração.
+> Em produção, altere a senha do `ctsroot` no painel do CT-VL e atualize os scripts.
+
 ---
 
 ## 5. Acesse a aplicação
@@ -126,21 +139,6 @@ Visualização pública de servidores e contratos com detokenização por perfil
 - `ServidorPublico`: CPF, benefícios, endereço, data de nascimento
 - `ContratoPublico`: CNPJ, responsável, dados bancários
 
----
-
-## Credenciais padrão do CTS
-
-O script `setup_cts_users.py` autentica no CT-VL com as credenciais de administrador padrão:
-
-| Campo | Valor |
-|-------|-------|
-| Usuário | `ctsroot` |
-| Senha | `N3oS3nh@2021` |
-
-> **Atenção:** Estas são as credenciais padrão do ambiente de demonstração.
-> Em produção, altere a senha do `ctsroot` no painel do CT-VL e atualize os scripts.
-
----
 
 ## Parar os serviços
 
