@@ -56,8 +56,8 @@ Edite `microtoken/.env` com os IPs do seu ambiente:
 
 ```env
 # IPs dos servidores Thales
-CTS_IP=192.168.130.38          # CT-VL (CTS)
-CTM_IP=192.168.130.51          # CipherTrust Manager (opcional)
+CTS_IP=<IP da sua instância CT-VL>       # CT-VL (CTS)
+CTM_IP=<IP da sua instância CTM>         # CipherTrust Manager (opcional)
 
 # Configurações de tokenização (manter padrão para demo)
 CTM_KEY_NAME=cts
