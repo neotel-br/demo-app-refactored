@@ -12,11 +12,7 @@ Cobre dois cenários de uso: cadastro de funcionários com RH interno e portal d
 | Docker + Docker Compose | Docker 24+ |
 | Python 3 | 3.9+ |
 | Acesso de rede ao CT-VL (CTS_IP) | — |
-| Acesso de rede ao CTM *(opcional)* | — |
-
-> **CTM (CipherTrust Manager)** é necessário apenas se você quiser que o script de setup crie
-> automaticamente a chave simétrica no vault. Sem CTM, o setup ainda funciona se a chave
-> já existir no CT-VL.
+| Acesso de rede ao CTM  | — |
 
 ---
 
