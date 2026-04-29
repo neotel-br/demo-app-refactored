@@ -48,7 +48,7 @@ def call_microtoken(endpoint, payload, *, operation, field_name, extra_log_conte
         logger.error("%s endpoint: %s response: %s%s", message, url, body, extra_log_context)
         raise MicrotokenError(message, status_code=502)
 
-    if body.get("status") == "error":
+    if isinstance(body, dict) and body.get("status") == "error":
         reason = body.get("reason") or body.get("error") or "unknown error"
         message = f"Microtoken API rejected {operation} for {field_name}: {reason}."
         logger.error("%s endpoint: %s%s", message, url, extra_log_context)
