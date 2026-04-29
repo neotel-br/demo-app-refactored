@@ -4,14 +4,18 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.csrf import csrf_exempt
-from .models import *
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return
 from rest_framework import status
 import logging
 from rest_framework.response import Response
-from .serializers import DepartmentSerializer, EmployeeSerializer, PositionSerializer
+from .serializers import DepartmentSerializer, EmployeeSerializer, PositionSerializer, ServidorPublicoSerializer, ContratoPublicoSerializer
+from .models import Employee, Department, Position, ServidorPublico, ContratoPublico
 from .microtoken import MicrotokenError, call_microtoken
 
 logger = logging.getLogger("loggers")
@@ -60,6 +64,8 @@ def get_department(request, department_id):
 
 # Removed @login_required for API access
 @api_view(["POST"])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([])
 def detokenize(request):
     try:
         employee_data = request.data
@@ -371,6 +377,21 @@ def logout_api(request):
         )
 
 
+@api_view(["DELETE"])
+def delete_employee(request, employee_id):
+    try:
+        employee = Employee.objects.get(id=employee_id)
+        name = employee.employee_name
+        employee.delete()
+        logger.info(f"operation: delete_employee status: success employee: {name} id: {employee_id} user: {request.user.username}")
+        return Response({"message": "Funcionário removido com sucesso"}, status=status.HTTP_200_OK)
+    except Employee.DoesNotExist:
+        return Response({"error": "Funcionário não encontrado"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"operation: delete_employee status: fail error: {str(e)}")
+        return Response({"error": "Erro ao remover funcionário"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(["GET"])
 @authentication_classes([SessionAuthentication])
 @permission_classes([])
@@ -389,3 +410,122 @@ def get_current_user(request):
         "username": request.user.username,
         "email": request.user.email,
     })
+
+
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
+def list_servidores_portal(request):
+    servidores = ServidorPublico.objects.all()
+    serializer = ServidorPublicoSerializer(servidores, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
+def list_contratos_portal(request):
+    contratos = ContratoPublico.objects.all()
+    serializer = ContratoPublicoSerializer(contratos, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([])
+def portal_detokenize(request):
+    fields = request.data.get("fields", [])
+    clear = request.data.get("clear", False)
+    clear_str = "true" if clear else "false"
+
+    by_datatype = {}
+    for field in fields:
+        dt = field.get("datatype")
+        if dt not in by_datatype:
+            by_datatype[dt] = []
+        by_datatype[dt].append(field)
+
+    result = {}
+    for datatype, dt_fields in by_datatype.items():
+        tokens_payload = [{datatype: f["token"]} for f in dt_fields]
+        payload = tokens_payload if len(tokens_payload) > 1 else tokens_payload[0]
+
+        try:
+            response_data = call_microtoken(
+                f"/detokenize/{datatype}?clear={clear_str}",
+                payload,
+                operation="detokenize",
+                field_name=f"portal_{datatype}",
+            )
+            if isinstance(response_data, list):
+                for field, resp in zip(dt_fields, response_data):
+                    result[field["key"]] = resp.get("data")
+            else:
+                for field in dt_fields:
+                    result[field["key"]] = response_data.get("data")
+        except MicrotokenError as exc:
+            logger.error("Portal detokenize failed for %s: %s", datatype, exc)
+            for field in dt_fields:
+                result[field["key"]] = None
+
+    return Response(result)
+
+
+@api_view(["POST"])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([])
+def create_servidor_portal(request):
+    required = ["nome", "orgao", "sigla_orgao", "cargo", "siape", "vinculo",
+                "admissao", "situacao", "salario", "servidor_cpf",
+                "servidor_beneficios", "servidor_endereco", "servidor_nascimento"]
+    for field in required:
+        if not request.data.get(field):
+            return Response({"error": f"{field} é obrigatório"}, status=status.HTTP_400_BAD_REQUEST)
+
+    servidor = ServidorPublico.objects.create(**{k: request.data[k] for k in required})
+    logger.info("portal: created ServidorPublico id=%s nome=%s", servidor.id, servidor.nome)
+    return Response(ServidorPublicoSerializer(servidor).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["DELETE"])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([])
+def delete_servidor_portal(request, servidor_id):
+    try:
+        servidor = ServidorPublico.objects.get(id=servidor_id)
+        nome = servidor.nome
+        servidor.delete()
+        logger.info("portal: deleted ServidorPublico id=%s nome=%s", servidor_id, nome)
+        return Response({"message": "Servidor removido com sucesso"})
+    except ServidorPublico.DoesNotExist:
+        return Response({"error": "Servidor não encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["POST"])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([])
+def create_contrato_portal(request):
+    required = ["numero", "objeto", "orgao", "sigla_orgao", "fornecedor", "valor",
+                "data_assinatura", "vigencia", "situacao", "modalidade",
+                "contrato_cnpj", "contrato_responsavel", "contrato_banco"]
+    for field in required:
+        if not request.data.get(field):
+            return Response({"error": f"{field} é obrigatório"}, status=status.HTTP_400_BAD_REQUEST)
+
+    contrato = ContratoPublico.objects.create(**{k: request.data[k] for k in required})
+    logger.info("portal: created ContratoPublico id=%s numero=%s", contrato.id, contrato.numero)
+    return Response(ContratoPublicoSerializer(contrato).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["DELETE"])
+@authentication_classes([CsrfExemptSessionAuthentication])
+@permission_classes([])
+def delete_contrato_portal(request, contrato_id):
+    try:
+        contrato = ContratoPublico.objects.get(id=contrato_id)
+        numero = contrato.numero
+        contrato.delete()
+        logger.info("portal: deleted ContratoPublico id=%s numero=%s", contrato_id, numero)
+        return Response({"message": "Contrato removido com sucesso"})
+    except ContratoPublico.DoesNotExist:
+        return Response({"error": "Contrato não encontrado"}, status=status.HTTP_404_NOT_FOUND)

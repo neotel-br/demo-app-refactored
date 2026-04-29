@@ -109,3 +109,145 @@ class Employee(models.Model):
                 self.is_tokenized = False
 
         super().save(*args, **kwargs)
+
+
+class ServidorPublico(models.Model):
+    SENSITIVE_FIELDS = {
+        "servidor_cpf": "cpf",
+        "servidor_beneficios": "beneficio",
+        "servidor_endereco": "endereco",
+        "servidor_nascimento": "nascimento",
+    }
+
+    nome = models.CharField(max_length=150)
+    orgao = models.CharField(max_length=200)
+    sigla_orgao = models.CharField(max_length=20)
+    cargo = models.CharField(max_length=200)
+    siape = models.CharField(max_length=20)
+    vinculo = models.CharField(max_length=100)
+    admissao = models.CharField(max_length=20)
+    situacao = models.CharField(max_length=50, default="Ativo")
+    salario = models.CharField(max_length=50)
+    servidor_cpf = models.CharField(max_length=500)
+    servidor_cpf_masked = models.CharField(max_length=200, default="")
+    servidor_beneficios = models.CharField(max_length=500)
+    servidor_beneficios_masked = models.CharField(max_length=200, default="")
+    servidor_endereco = models.CharField(max_length=500)
+    servidor_endereco_masked = models.CharField(max_length=200, default="")
+    servidor_nascimento = models.CharField(max_length=500)
+    servidor_nascimento_masked = models.CharField(max_length=200, default="")
+    is_tokenized = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.nome
+
+    def save(self, *args, **kwargs):
+        if not self.is_tokenized:
+            tokens = {}
+            try:
+                for field_key, datatype in self.SENSITIVE_FIELDS.items():
+                    field_value = getattr(self, field_key)
+                    tok_data = call_microtoken(
+                        f"/tokenize/{datatype}",
+                        {datatype: field_value},
+                        operation="tokenize",
+                        field_name=field_key,
+                    )
+                    token = tok_data.get("token")
+                    if not token:
+                        raise MicrotokenError(f"No token for {field_key}")
+                    tokens[field_key] = token
+
+                for field_key, tok in tokens.items():
+                    setattr(self, field_key, tok)
+
+                for field_key, datatype in self.SENSITIVE_FIELDS.items():
+                    try:
+                        mask_data = call_microtoken(
+                            f"/detokenize/{datatype}?clear=false",
+                            {datatype: tokens[field_key]},
+                            operation="detokenize",
+                            field_name=f"{field_key}_masked",
+                        )
+                        setattr(self, f"{field_key}_masked", mask_data.get("data", "•••••••"))
+                    except MicrotokenError:
+                        setattr(self, f"{field_key}_masked", "•••••••")
+
+                self.is_tokenized = True
+                logger.info("Tokenized ServidorPublico: %s", self.nome)
+
+            except MicrotokenError as exc:
+                logger.warning("Microtoken unavailable for ServidorPublico: %s", exc)
+                self.is_tokenized = False
+
+        super().save(*args, **kwargs)
+
+
+class ContratoPublico(models.Model):
+    SENSITIVE_FIELDS = {
+        "contrato_cnpj": "cnpj",
+        "contrato_responsavel": "responsavel",
+        "contrato_banco": "bank",
+    }
+
+    numero = models.CharField(max_length=50)
+    objeto = models.TextField()
+    orgao = models.CharField(max_length=200)
+    sigla_orgao = models.CharField(max_length=20)
+    fornecedor = models.CharField(max_length=200)
+    valor = models.CharField(max_length=50)
+    data_assinatura = models.CharField(max_length=20)
+    vigencia = models.CharField(max_length=80)
+    situacao = models.CharField(max_length=50)
+    modalidade = models.CharField(max_length=100)
+    contrato_cnpj = models.CharField(max_length=500)
+    contrato_cnpj_masked = models.CharField(max_length=200, default="")
+    contrato_responsavel = models.CharField(max_length=500)
+    contrato_responsavel_masked = models.CharField(max_length=200, default="")
+    contrato_banco = models.CharField(max_length=500)
+    contrato_banco_masked = models.CharField(max_length=200, default="")
+    is_tokenized = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.numero
+
+    def save(self, *args, **kwargs):
+        if not self.is_tokenized:
+            tokens = {}
+            try:
+                for field_key, datatype in self.SENSITIVE_FIELDS.items():
+                    field_value = getattr(self, field_key)
+                    tok_data = call_microtoken(
+                        f"/tokenize/{datatype}",
+                        {datatype: field_value},
+                        operation="tokenize",
+                        field_name=field_key,
+                    )
+                    token = tok_data.get("token")
+                    if not token:
+                        raise MicrotokenError(f"No token for {field_key}")
+                    tokens[field_key] = token
+
+                for field_key, tok in tokens.items():
+                    setattr(self, field_key, tok)
+
+                for field_key, datatype in self.SENSITIVE_FIELDS.items():
+                    try:
+                        mask_data = call_microtoken(
+                            f"/detokenize/{datatype}?clear=false",
+                            {datatype: tokens[field_key]},
+                            operation="detokenize",
+                            field_name=f"{field_key}_masked",
+                        )
+                        setattr(self, f"{field_key}_masked", mask_data.get("data", "•••••••"))
+                    except MicrotokenError:
+                        setattr(self, f"{field_key}_masked", "•••••••")
+
+                self.is_tokenized = True
+                logger.info("Tokenized ContratoPublico: %s", self.numero)
+
+            except MicrotokenError as exc:
+                logger.warning("Microtoken unavailable for ContratoPublico: %s", exc)
+                self.is_tokenized = False
+
+        super().save(*args, **kwargs)
